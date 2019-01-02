@@ -30,12 +30,12 @@ public class GPSManager {
         config.setLocationProvider(1);
         config.setDesiredAccuracy(1);
         config.setStopOnTerminate(false);
-        //config.setUrl("http://192.168.1.43:8080/gpsloc/add");
-        config.setUrl("http://192.168.1.43:3000/api/gps");
+        config.setUrl("http://192.168.1.43:8080/gpsloc/add");
+        //config.setUrl("http://192.168.1.43:3000/api/gps");
 
         HashMap attrs = new HashMap<String, String>();
-        attrs.put("latitude", "@latitude");
-        attrs.put("longitude", "@longitude");
+        attrs.put("lat", "@latitude");
+        attrs.put("lon", "@longitude");
         attrs.put("speed", "@speed");
 
         config.setTemplate(new HashMapLocationTemplate(attrs));
