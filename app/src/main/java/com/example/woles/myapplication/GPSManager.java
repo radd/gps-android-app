@@ -6,6 +6,9 @@ import com.marianhello.bgloc.Config;
 import com.marianhello.bgloc.PluginDelegate;
 import com.marianhello.bgloc.PluginException;
 import com.marianhello.bgloc.data.BackgroundLocation;
+import com.marianhello.bgloc.data.HashMapLocationTemplate;
+
+import java.util.HashMap;
 
 
 public class GPSManager {
@@ -27,7 +30,15 @@ public class GPSManager {
         config.setLocationProvider(1);
         config.setDesiredAccuracy(1);
         config.setStopOnTerminate(false);
+        //config.setUrl("http://192.168.1.43:8080/gpsloc/add");
+        config.setUrl("http://192.168.1.43:3000/api/gps");
 
+        HashMap attrs = new HashMap<String, String>();
+        attrs.put("latitude", "@latitude");
+        attrs.put("longitude", "@longitude");
+        attrs.put("speed", "@speed");
+
+        config.setTemplate(new HashMapLocationTemplate(attrs));
 
         try {
             facade.configure(config);
