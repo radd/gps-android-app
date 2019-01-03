@@ -43,6 +43,7 @@
                 android:layout_weight="1"
                 android:id="@+id/menuBtn"
                 android:clickable="true"
+                android:onClick="menuBtn_onClick"
         />
     </LinearLayout>
 

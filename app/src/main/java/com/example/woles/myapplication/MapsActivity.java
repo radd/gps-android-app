@@ -1,5 +1,6 @@
 package com.example.woles.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -23,7 +24,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
 
     private Marker mainMarker;
 
-    private GPSManager gpsManager;
+    static public GPSManager gpsManager;
     private  Button startBtn;
     private boolean isRunning;
 
@@ -57,6 +58,11 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
 
             }
         });
+    }
+
+    public void menuBtn_onClick(View view) {
+        Intent intent = new Intent(this, MenuActivity.class);
+        startActivity(intent);
     }
 
 

@@ -30,7 +30,7 @@ public class GPSManager {
         config.setLocationProvider(1);
         config.setDesiredAccuracy(1);
         config.setStopOnTerminate(false);
-        config.setUrl("http://192.168.1.43:8080/gpsloc/add");
+        //config.setUrl("http://192.168.1.43:8080/gpsloc/add");
         //config.setUrl("http://192.168.1.43:3000/api/gps");
 
         HashMap attrs = new HashMap<String, String>();
@@ -47,6 +47,7 @@ public class GPSManager {
         }
 
     }
+
 
     public BackgroundGeolocationFacade getFacade() {
         return facade;
@@ -69,5 +70,16 @@ public class GPSManager {
                 }
             }
         }).start();
+    }
+
+    public void saveURL(String url) {
+        Config config = new Config();
+        config.setUrl(url);
+
+        try {
+            facade.configure(config);
+        } catch (PluginException e) {
+            e.printStackTrace();
+        }
     }
 }
