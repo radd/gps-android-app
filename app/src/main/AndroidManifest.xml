@@ -45,6 +45,9 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".SignUpActivity"
+                  android:label="Nowe konto">
+        </activity>
 
     </application>
 

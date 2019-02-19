@@ -1,8 +1,11 @@
 package com.example.woles.myapplication;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -10,31 +13,70 @@ import android.widget.EditText;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.Map;
+
 public class LoginActivity extends AppCompatActivity {
 
-    EditText mURL;
+    EditText emailInput;
+    EditText passwordInput;
+    AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        //mURL = (EditText) findViewById(R.id.URL);
+        alertDialog = new AlertDialog.Builder(this).create();
 
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        String token = sharedPref.getString(getString(R.string.token), null);
+        SharedPreferences sharedPref = this.getSharedPreferences("authInfo", Context.MODE_PRIVATE);
+        String token = sharedPref.getString("token", "");
+        String email = sharedPref.getString("userEmail", "");
+        boolean userActive = sharedPref.getBoolean("userActive", false);
 
-        if(token == null)
+        /*if(userActive) {
+            Intent intent = new Intent(this, MapsActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }*/
+
+        emailInput = (EditText) findViewById(R.id.email);
+        passwordInput = (EditText) findViewById(R.id.password);
+
+        emailInput.setText(email);
+
+
+        if(token.isEmpty())
             Log.e("LOG", "token null");
         else
             Log.e("LOG", "token:" + token);
     }
 
     public void loginBtn_onClick(View view) {
+        new Thread(new Runnable() {
+            public void run() {
+                signIn();
+            }
+        }).start();
 
+
+
+    }
+
+    private void signIn() {
         JSONObject json = new JSONObject();
 
-        EditText emailInput = (EditText) findViewById(R.id.email);
-        EditText passwordInput = (EditText) findViewById(R.id.password);
+
+
+        SharedPreferences sharedPref = this.getSharedPreferences("authInfo", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
 
         try {
             json.put("email", emailInput.getText());
@@ -45,17 +87,17 @@ public class LoginActivity extends AppCompatActivity {
         String body = json.toString();
         Log.e("LOG", ""+body);
 
-       /* try {
-            HttpURLConnection conn = (HttpURLConnection) new URL("").openConnection();
+        try {
+            HttpURLConnection conn = (HttpURLConnection) new URL("http://192.168.1.43:8080/api/auth/sign-in").openConnection();
             conn.setDoOutput(true);
             conn.setFixedLengthStreamingMode(body.length());
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
-            Iterator<Map.Entry<String, String>> it = headers.entrySet().iterator();
+            /*Iterator<Map.Entry<String, String>> it = headers.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<String, String> pair = it.next();
                 conn.setRequestProperty(pair.getKey(), pair.getValue());
-            }
+            }*/
 
             OutputStreamWriter os = null;
             try {
@@ -69,16 +111,78 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
 
+            Log.e("LOG", ""+ conn.getResponseCode());
+
+            if(conn.getResponseCode() == 200){
+
+                BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+                StringBuilder sb = new StringBuilder();
+                String output;
+                while ((output = br.readLine()) != null) {
+                    sb.append(output);
+                }
+                JSONObject jsonBody = new JSONObject(sb.toString());
+                JSONObject data = jsonBody.getJSONObject("data");
+                String token = data.getString("accessToken");
+                JSONObject user = data.getJSONObject("user");
+                String userID = user.getString("_id");
+                String userEmail = user.getString("email");
+                String username = user.getString("username");
+
+                editor.putString("token", token);
+                editor.putString("userID", userID);
+                editor.putString("userEmail", userEmail);
+                editor.putString("username", username);
+                editor.putBoolean("userActive", true);
+                editor.commit();
+
+                Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+
+            }
+            else {
+                alertDialog.setTitle("Error");
+                alertDialog.setMessage("");
+                alertDialog.setCancelable(false);
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+
+
+                if(conn.getResponseCode() == 401) {
+                    alertDialog.setMessage("Nieprawidłowy email lub hasło");
+                }
+                else {
+                    BufferedReader br = new BufferedReader(new InputStreamReader((conn.getErrorStream())));
+                    StringBuilder sb = new StringBuilder();
+                    String output;
+                    while ((output = br.readLine()) != null) {
+                        sb.append(output);
+                    }
+                    JSONObject jsonBody = new JSONObject(sb.toString());
+                    String errorMsg = jsonBody.getString("message");
+                    alertDialog.setMessage(errorMsg);
+                }
+
+                LoginActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        alertDialog.show();
+                    }
+                });
+            }
+
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-
-
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getString(R.string.token), );
-        editor.commit();*/
 
 
     }
@@ -86,6 +190,8 @@ public class LoginActivity extends AppCompatActivity {
     public void signUpBtn_onClick(View view) {
         Log.e("LOG", "nowe konto");
 
+        Intent intent = new Intent(this, SignUpActivity.class);
+        startActivity(intent);
     }
 
 
