@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.example.woles.myapplication.LoginActivity">
+
+    <!--    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Zapisz"
+            android:id="@+id/saveBtn"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:onClick="save"/>
+
+    <EditText
+            android:id="@+id/URL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/saveBtn"
+            android:layout_toStartOf="@+id/saveBtn"
+            android:hint="IP"
+            android:text="http://192.168.1.43:8080/gpsloc/add"
+    />-->
+
+
+    <TextView
+            android:text="Email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/emailText"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            />
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:ems="10"
+            android:id="@+id/email"
+            android:layout_alignTop="@id/emailText"
+            android:layout_marginTop="20dp"
+            android:layout_alignLeft="@id/emailText"
+            android:layout_alignRight="@id/emailText"
+
+            />
+    <TextView
+            android:text="Hasło"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/passwordText"
+
+            android:layout_alignTop="@id/email"
+            android:layout_marginTop="60dp"
+            android:layout_alignLeft="@id/emailText"
+            android:layout_alignRight="@id/emailText"
+    />
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:id="@+id/password"
+            android:layout_alignTop="@id/passwordText"
+            android:layout_marginTop="20dp"
+            android:layout_alignLeft="@id/emailText"
+            android:layout_alignRight="@id/emailText"
+    />
+
+    <Button
+            android:text="Zaloguj się"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/loginBtn"
+            android:onClick="loginBtn_onClick"
+            android:layout_alignTop="@id/password"
+            android:layout_marginTop="60dp"
+            android:layout_alignLeft="@id/emailText"
+            android:layout_alignRight="@id/emailText"
+
+    />
+    <Button
+            android:text="Załóż konto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/signUpBtn"
+            android:onClick="signUpBtn_onClick"
+            android:layout_alignTop="@id/loginBtn"
+            android:layout_marginTop="60dp"
+            android:layout_alignLeft="@id/emailText"
+            android:layout_alignRight="@id/emailText"
+    />
+
+</RelativeLayout>
