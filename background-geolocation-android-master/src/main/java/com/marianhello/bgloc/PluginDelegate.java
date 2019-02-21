@@ -16,4 +16,9 @@ public interface PluginDelegate {
     void onAbortRequested();
     void onHttpAuthorization();
     void onError(PluginException error);
+
+    void onUsers(String users);
+
+    void onWebSocketMessage(String payload);
+    void clearMap();
 }

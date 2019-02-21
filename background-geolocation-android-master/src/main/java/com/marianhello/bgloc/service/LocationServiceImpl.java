@@ -55,11 +55,19 @@ import com.marianhello.logging.UncaughtExceptionLogger;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import org.chromium.content.browser.ThreadUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +114,8 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
     public static final int MSG_ON_HTTP_AUTHORIZATION = 107;
 
     public static final int MSG_ON_WEBSOCKET_MESSAGE = 110;
+    public static final int MSG_ON_USERS = 111;
+    public static final int MSG_ON_CLEAR_MAP = 112;
 
     /** notification id */
     private static int NOTIFICATION_ID = 1;
@@ -736,7 +746,7 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
     public static volatile String WS_URL;
     public static volatile String usersURL;
 
-    private List<String> usersIDs;
+    private List<String> usersIDs = new ArrayList<>();
 
     private CompositeDisposable compositeDisposableUserSub = new CompositeDisposable();
 
@@ -757,10 +767,64 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
             e.printStackTrace();
         }
 
-        if(stompClient == null || !stompClient.isConnected())
-            openWebSocket();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //if(usersIDs.size() == 0) {
+                    getUsers();
+                //}
+
+
+                if(stompClient == null || !stompClient.isConnected())
+                    openWebSocket();
+            }
+        }).start();
+
 
     }
+
+    public void getUsers() {
+        try {
+
+            HttpURLConnection conn = (HttpURLConnection) new URL(usersURL).openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", "Bearer " + token);
+
+            if (conn.getResponseCode() == 200) {
+
+                BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+                StringBuilder sb = new StringBuilder();
+                String output;
+                while ((output = br.readLine()) != null) {
+                    sb.append(output);
+                }
+
+                JSONArray jsonBody = new JSONArray(sb.toString());
+                for(int i = 0;i < jsonBody.length(); i++) {
+                    usersIDs.add(jsonBody.getJSONObject(i).getString("_id"));
+                }
+
+            /*    ThreadUtils.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                    }
+                });*/
+
+                Bundle bundle = new Bundle();
+                bundle.putInt("action", MSG_ON_USERS);
+                bundle.putString("payload", sb.toString());
+                broadcastMessage(bundle);
+
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     public void openWebSocket() {
@@ -801,13 +865,15 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
 
      public void subscribeAllUsers() {
 
+        Log.e("LOG", "user size + "+usersIDs.size());
 
+         for(int i = 0;i < usersIDs.size(); i++) {
+             if(!usersIDs.get(i).equals(userID))
+                subscribeUser(usersIDs.get(i));
+         }
 
-
-
-
-         subscribeUser("5c5d6da932bee21b60fca64b");
-         subscribeUser("5c5d6f9232bee21b60fca64c");
+         //subscribeUser("5c5d6da932bee21b60fca64b");
+         //subscribeUser("5c5d6f9232bee21b60fca64c");
 
       /*  if(!stompClient.isConnected())
             return;
@@ -827,8 +893,9 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
         //    return;
 
         Disposable subscribe = stompClient.topic("/topic/get/"+ id).subscribe(topicMessage -> {
-            Log.e("WEBSOCKET", topicMessage.getPayload());
-            //prepareLocationAndSend(topicMessage.getPayload());
+            //Log.e("WEBSOCKET", topicMessage.getPayload());
+
+            prepareLocationAndSend(topicMessage.getPayload());
         }, error ->{
             Log.e("WEBSOCKET", error.getMessage());
         });

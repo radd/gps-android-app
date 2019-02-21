@@ -1,6 +1,7 @@
 package com.example.woles.myapplication;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -10,15 +11,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.*;
 import com.marianhello.bgloc.PluginDelegate;
 import com.marianhello.bgloc.PluginException;
 import com.marianhello.bgloc.WebSocketTrans;
 import com.marianhello.bgloc.data.BackgroundActivity;
 import com.marianhello.bgloc.data.BackgroundLocation;
 import io.reactivex.disposables.CompositeDisposable;
+import org.chromium.content.browser.ThreadUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import ua.naiksoftware.stomp.Stomp;
@@ -26,7 +27,9 @@ import ua.naiksoftware.stomp.StompClient;
 import io.reactivex.disposables.Disposable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class MapsActivity extends FragmentActivity implements IGPSManager, PluginDelegate, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
@@ -139,7 +142,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     }
 
     public void menuBtn_onClick(View view) {
-        Intent intent = new Intent(this, MenuActivity.class);
+        Intent intent = new Intent(this, SubsActivity.class);
         startActivity(intent);
     }
 
@@ -208,13 +211,15 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        if(marker.getTag() == null)
+            return false;
 
         if (marker.getTag().equals("id1"))
         {
             //handle click here
             Log.e("", "clicked4");
         }
-
+        marker.showInfoWindow();
         return false;
     }
 
@@ -289,6 +294,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     public void onError(PluginException error) {
 
     }
+
     @Override
     public void onAuthorizationChanged(int authStatus) {
         if(authStatus == 1)
@@ -298,7 +304,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     private void openWebSocket() {
 
 
-        
+
 
         JSONObject jsonObject = new JSONObject();
         String serverIP = "192.168.1.41";
@@ -318,6 +324,114 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     }
 
 
+    private ConcurrentHashMap<String, JSONObject> users = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Marker> markers = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Polyline> polylines = new ConcurrentHashMap<>();
+
+
+    @Override
+    public void onUsers(String usersJson) {
+        users = new ConcurrentHashMap<>();
+        polylines = new ConcurrentHashMap<>();
+
+        Log.e("LOG", "get users: " + usersJson);
+
+        try {
+            JSONArray array = new JSONArray(usersJson);
+
+            for(int i = 0;i<array.length();i++) {
+                JSONObject user = array.getJSONObject(i);
+                users.put(user.getString("_id"), user);
+            }
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+
+
+    }
+
+    @Override
+    public void onWebSocketMessage(String payload) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                if(mMap == null)
+                    return;
+
+                JSONObject location = null;
+                try {
+                    location = new JSONObject(payload);
+
+                    String userID = location.getString("userID");
+                    if( users.get(location.getString("userID")) != null) {
+
+                        LatLng latLng = new LatLng(Double.valueOf(location.getString("latitude")),
+                                Double.valueOf(location.getString("longitude")));
+
+                        if(markers.get(userID) != null && polylines.get(userID) != null ) {
+                            ThreadUtils.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    markers.get(userID).setPosition(latLng);
+                                    List<LatLng> points = polylines.get(userID).getPoints();
+                                    points.add(latLng);
+                                    polylines.get(userID).setPoints(points);
+                                }
+                            });
+                        }
+                        else {
+                            String username = users.get(location.getString("userID")).getString("username");
+                            ThreadUtils.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).title(username));
+                                    marker.showInfoWindow();
+                                    markers.put(userID, marker);
+                                    Polyline polyline = mMap.addPolyline(new PolylineOptions()
+                                            .add(latLng)
+                                            .width(5)
+                                            .color(Color.RED));
+                                    polylines.put(userID, polyline);
+                                }
+                            });
+
+                        }
+
+                        Log.e("LOG", "User: " + users.get(location.getString("userID")).getString("username")
+                                + " loc: " + location.getString("latitude")
+                                + " " + location.getString("longitude"));
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+
+    }
+
+    @Override
+    public void clearMap() {
+        for(String key : markers.keySet()) {
+            markers.get(key).remove();
+        }
+        markers.clear();
+        for(String key : polylines.keySet()) {
+            polylines.get(key).remove();
+        }
+        polylines.clear();
+
+    }
 
 }
 

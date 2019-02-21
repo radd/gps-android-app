@@ -51,6 +51,9 @@
                   android:label="Nowe konto">
         </activity>
 
+        <activity android:name=".SubsActivity"
+                  android:label="Subs">
+        </activity>
     </application>
 
 </manifest>

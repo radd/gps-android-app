@@ -82,4 +82,8 @@ public class GPSManager {
             e.printStackTrace();
         }
     }
+
+    /*public void clearMap() {
+        igpsManager.clearMap();
+    }*/
 }

@@ -73,7 +73,7 @@ public class BackgroundGeolocationFacade {
 
         NotificationHelper.registerAllChannels(getApplicationContext());
 
-        if(isRunning())
+
             registerServiceBroadcast();
 
     }
@@ -167,6 +167,24 @@ public class BackgroundGeolocationFacade {
                         mDelegate.onHttpAuthorization();
                     } 
 
+                    return;
+                }
+
+                case LocationServiceImpl.MSG_ON_USERS: {
+                    logger.debug("Received MSG_ON_USERS");
+                    String users = bundle.getString("payload");
+                    mDelegate.onUsers(users);
+                    return;
+                }
+                case LocationServiceImpl.MSG_ON_WEBSOCKET_MESSAGE: {
+                    logger.debug("Received MSG_ON_WEBSOCKET_MESSAGE");
+                    String payload = bundle.getString("payload");
+                    mDelegate.onWebSocketMessage(payload);
+                    return;
+                }
+                case LocationServiceImpl.MSG_ON_CLEAR_MAP: {
+                    logger.debug("Received MSG_ON_CLEAR_MAP");
+                    mDelegate.clearMap();
                     return;
                 }
             }
