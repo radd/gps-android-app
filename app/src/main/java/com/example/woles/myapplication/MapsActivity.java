@@ -41,6 +41,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     static public GPSManager gpsManager;
     private  Button startBtn;
     private boolean isRunning;
+    private boolean isSubAll = false;
+    private Button subBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +86,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
 
             }
         });
-
+        subBtn = findViewById(R.id.subBtn);
      /*   StompClient mStompClient;
 
         Map<String, String> headers = new HashMap<>();
@@ -142,8 +144,19 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     }
 
     public void menuBtn_onClick(View view) {
-        Intent intent = new Intent(this, SubsActivity.class);
-        startActivity(intent);
+        //Intent intent = new Intent(this, SubsActivity.class);
+        //startActivity(intent);
+        if(isSubAll) {
+            gpsManager.getFacade().unSubAll();
+            subBtn.setText("Obesrwuj");
+            isSubAll = false;
+        }
+        else {
+            isSubAll = true;
+            gpsManager.getFacade().subAll();
+            subBtn.setText("Nie obesrwuj");
+        }
+
     }
 
 
@@ -376,14 +389,12 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
                         LatLng latLng = new LatLng(Double.valueOf(location.getString("latitude")),
                                 Double.valueOf(location.getString("longitude")));
 
-                        if(markers.get(userID) != null && polylines.get(userID) != null ) {
+                        if(markers.get(userID) != null ) {
                             ThreadUtils.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     markers.get(userID).setPosition(latLng);
-                                    List<LatLng> points = polylines.get(userID).getPoints();
-                                    points.add(latLng);
-                                    polylines.get(userID).setPoints(points);
+
                                 }
                             });
                         }
@@ -395,11 +406,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
                                     Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).title(username));
                                     marker.showInfoWindow();
                                     markers.put(userID, marker);
-                                    Polyline polyline = mMap.addPolyline(new PolylineOptions()
-                                            .add(latLng)
-                                            .width(5)
-                                            .color(Color.RED));
-                                    polylines.put(userID, polyline);
+
                                 }
                             });
 

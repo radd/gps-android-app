@@ -521,6 +521,14 @@ public class BackgroundGeolocationFacade {
         mService.setUserInfoAndOpenWS(s);
     }
 
+    public void unSubAll() {
+        mService.unSubscribeAllUsers();
+    }
+
+    public void subAll() {
+        mService.subscribeAllUsers();
+    }
+
    /* public void setToken(String token) {
         mService.setToken(token);
     }

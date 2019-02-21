@@ -16,6 +16,8 @@ public interface LocationService {
     void executeProviderCommand(int command, int arg);
 
     void setUserInfoAndOpenWS(String info);
+    void unSubscribeAllUsers();
+    void subscribeAllUsers();
 
    /* void setToken(String token);
     void setUserID(String id);

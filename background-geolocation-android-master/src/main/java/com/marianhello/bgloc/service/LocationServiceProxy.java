@@ -100,4 +100,20 @@ public class LocationServiceProxy implements LocationService, LocationServiceInf
                 .build();
         executeIntentCommand(intent);
     }
+
+    @Override
+    public void unSubscribeAllUsers() {
+        Intent intent = mIntentBuilder
+                .setCommand(CommandId.UNSUB_ALL)
+                .build();
+        executeIntentCommand(intent);
+    }
+
+    @Override
+    public void subscribeAllUsers() {
+        Intent intent = mIntentBuilder
+                .setCommand(CommandId.SUB_ALL)
+                .build();
+        executeIntentCommand(intent);
+    }
 }

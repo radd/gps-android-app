@@ -340,6 +340,12 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
                 case CommandId.USER_INFO:
                     setUserInfoAndOpenWS((String) arg);
                     break;
+                case CommandId.SUB_ALL:
+                    subscribeAllUsers();
+                    break;
+                case CommandId.UNSUB_ALL:
+                    unSubscribeAllUsers();
+                    break;
             }
         } catch (Exception e) {
             logger.error("processCommand: exception", e);
@@ -398,7 +404,7 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
         }
 
         stopForeground(true);
-        stopSelf();
+        //stopSelf();
 
         broadcastMessage(MSG_ON_SERVICE_STOPPED);
         sIsRunning = false;
@@ -784,6 +790,7 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
     }
 
     public void getUsers() {
+        usersIDs = new ArrayList<>();
         try {
 
             HttpURLConnection conn = (HttpURLConnection) new URL(usersURL).openConnection();
@@ -847,7 +854,7 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
                 case OPENED:
                     Log.e("WEBSOCKET", "Stomp connection opened");
 
-                    subscribeAllUsers();
+                    //subscribeAllUsers();
                     break;
 
                 case ERROR:
@@ -862,7 +869,7 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
 
     }
 
-
+    @Override
      public void subscribeAllUsers() {
 
         Log.e("LOG", "user size + "+usersIDs.size());
@@ -883,9 +890,12 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
         }*/
     }
 
-
+    @Override
     public void unSubscribeAllUsers() {
        compositeDisposableUserSub.clear();
+        Bundle bundle = new Bundle();
+        bundle.putInt("action", MSG_ON_CLEAR_MAP);
+        broadcastMessage(bundle);
     }
 
     private void subscribeUser(String id) {

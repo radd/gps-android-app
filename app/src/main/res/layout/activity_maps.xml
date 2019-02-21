@@ -35,13 +35,13 @@
                 android:clickable="true"
         />
         <Button
-                android:text="Menu"
+                android:text="Obserwuj"
                 android:textColor="#FFFFFF"
                 android:background="@color/colorPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:id="@+id/menuBtn"
+                android:id="@+id/subBtn"
                 android:clickable="true"
                 android:onClick="menuBtn_onClick"
         />
