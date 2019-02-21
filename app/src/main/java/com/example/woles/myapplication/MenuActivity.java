@@ -24,4 +24,10 @@ public class MenuActivity extends AppCompatActivity {
         finish();
     }
 
+    public void logout(View view) {
+        UserInfo.logout();
+        UserInfo.redirectToLogin(this);
+        finish();
+    }
+
 }

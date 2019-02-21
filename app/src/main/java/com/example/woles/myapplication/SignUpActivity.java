@@ -1,5 +1,6 @@
 package com.example.woles.myapplication;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,6 +28,7 @@ public class SignUpActivity extends AppCompatActivity {
     EditText passwordInput;
     EditText password2Input;
     AlertDialog alertDialog;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +41,18 @@ public class SignUpActivity extends AppCompatActivity {
         password2Input = (EditText) findViewById(R.id.password2);
 
         alertDialog = new AlertDialog.Builder(this).create();
+        progressDialog = new ProgressDialog(this);
 
     }
 
     public void signUpBtn_onClick(View view) {
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setTitle("Tworzenie konta");
+        progressDialog.setMessage("Czekaj...");
+        progressDialog.setIndeterminate(true);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+
         new Thread(new Runnable() {
             public void run() {
                 signUp();
@@ -63,7 +73,7 @@ public class SignUpActivity extends AppCompatActivity {
         }
 
 
-        SharedPreferences sharedPref = this.getSharedPreferences("authInfo", Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = UserInfo.getPref(this);
         SharedPreferences.Editor editor = sharedPref.edit();
 
 
@@ -76,11 +86,6 @@ public class SignUpActivity extends AppCompatActivity {
             conn.setFixedLengthStreamingMode(body.length());
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
-            /*Iterator<Map.Entry<String, String>> it = headers.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry<String, String> pair = it.next();
-                conn.setRequestProperty(pair.getKey(), pair.getValue());
-            }*/
 
             OutputStreamWriter os = null;
             try {
@@ -111,7 +116,7 @@ public class SignUpActivity extends AppCompatActivity {
 
                                 dialog.dismiss();
                                 Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                                 finish();
                             }
@@ -129,32 +134,38 @@ public class SignUpActivity extends AppCompatActivity {
                 }
                 JSONObject jsonBody = new JSONObject(sb.toString());
                 String errorMsg = jsonBody.getString("message");
-
-                alertDialog.setTitle("Error");
-                alertDialog.setMessage(errorMsg);
-                alertDialog.setCancelable(false);
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
+                showErrorMessage(errorMsg);
             }
-
-            SignUpActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    alertDialog.show();
-                }
-            });
-
 
         } catch (IOException e) {
             e.printStackTrace();
+            showErrorMessage(e.getMessage());
         } catch (JSONException e) {
             e.printStackTrace();
+            showErrorMessage(e.getMessage());
         }
 
 
+    }
+
+    private void showErrorMessage(String message) {
+
+        alertDialog.setTitle("Błąd");
+        alertDialog.setMessage(message);
+        alertDialog.setCancelable(false);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        SignUpActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.dismiss();
+                alertDialog.show();
+            }
+        });
     }
 }

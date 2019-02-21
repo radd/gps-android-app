@@ -114,8 +114,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
-        targetCompatibility JavaVersion.VERSION_1_6
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     testOptions {
@@ -142,4 +142,6 @@ dependencies {
 
         compile fileTree(include: ['*.jar'], dir: 'libs')
     }
+    implementation project(':StompProtocolAndroid')
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.5'
 }

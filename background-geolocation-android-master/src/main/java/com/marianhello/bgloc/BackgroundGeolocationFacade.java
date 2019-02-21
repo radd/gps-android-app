@@ -498,4 +498,23 @@ public class BackgroundGeolocationFacade {
     public static LocationTransform getLocationTransform() {
         return LocationServiceImpl.getLocationTransform();
     }
+
+   /* public void setToken(String token) {
+        mService.setToken(token);
+    }
+
+    public void setUserID(String id) {
+        mService.setUserID(id);
+    }
+
+    public void setServerIP(String IP) {
+        mService.setServerIP(IP);
+    }
+
+    public void openWebSocket(WebSocketTrans webSocketTrans) {
+        mService.openWebSocket(webSocketTrans);
+    }*/
+
+
+
 }

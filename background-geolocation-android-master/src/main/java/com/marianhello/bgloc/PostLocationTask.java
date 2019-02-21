@@ -2,10 +2,12 @@ package com.marianhello.bgloc;
 
 import com.marianhello.bgloc.data.BackgroundLocation;
 import com.marianhello.bgloc.data.LocationDAO;
+import com.marianhello.bgloc.service.LocationServiceImpl;
 import com.marianhello.logging.LoggerManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -109,8 +111,15 @@ public class PostLocationTask {
     private void post(final BackgroundLocation location) {
         long locationId = location.getLocationId();
 
-        if (mHasConnectivity && mConfig.hasValidUrl()) {
+        if (mHasConnectivity ) {
+
+
+
             if (postLocation(location)) {
+
+
+
+
                 mLocationDAO.deleteLocationById(locationId);
 
                 return; // if posted successfully do nothing more
@@ -134,14 +143,35 @@ public class PostLocationTask {
         logger.debug("Executing PostLocationTask#postLocation");
         JSONArray jsonLocations = new JSONArray();
 
+        JSONObject jsonObject = new JSONObject();
+
         try {
-            jsonLocations.put(mConfig.getTemplate().locationToJson(location));
+            //jsonLocations.put(mConfig.getTemplate().locationToJson(location));
+
+            jsonObject.put("userID", LocationServiceImpl.userID);
+            jsonObject.put("timestamp", System.currentTimeMillis());
+            jsonObject.put("latitude", String.valueOf(location.getLatitude()));
+            jsonObject.put("longitude", String.valueOf(location.getLongitude()));
+            jsonObject.put("altitude", location.getAltitude());
+            jsonObject.put("speed", location.getSpeed());
+            jsonObject.put("accuracy", location.getAccuracy());
+
+
         } catch (JSONException e) {
             logger.warn("Location to json failed: {}", location.toString());
             return false;
         }
 
-        String url = mConfig.getUrl();
+        if(LocationServiceImpl.stompClient == null || !LocationServiceImpl.stompClient.isConnected())
+            return false;
+
+
+        LocationServiceImpl.stompClient.send("/ws/send/" + LocationServiceImpl.userID,
+                jsonObject.toString()).subscribe();
+
+
+
+        /*String url = mConfig.getUrl();
         logger.debug("Posting json to url: {} headers: {}", url, mConfig.getHttpHeaders());
         int responseCode;
 
@@ -173,7 +203,7 @@ public class PostLocationTask {
         if (!isStatusOkay) {
             logger.warn("Server error while posting locations responseCode: {}", responseCode);
             return false;
-        }
+        }*/
 
         return true;
     }

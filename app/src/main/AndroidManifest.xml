@@ -29,8 +29,14 @@
 
         <activity
                 android:name=".MapsActivity"
-                android:label="@string/title_activity_maps">
+                android:label="GPS Map"
+                android:theme="@style/AppTheme.NoActionBar"
+        >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
 
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
         <activity android:name=".MenuActivity"
                     android:label="Menu">
@@ -38,11 +44,7 @@
 
         <activity android:name=".LoginActivity"
                   android:label="Login">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
 
         <activity android:name=".SignUpActivity"

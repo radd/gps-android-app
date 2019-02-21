@@ -25,5 +25,13 @@
             android:hint="IP"
             android:text="http://192.168.1.43:8080/gpsloc/add"
     />
+    <Button
+            android:text="Wyloguj się"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:layout_alignParentStart="true"
+            android:layout_marginStart="28dp" android:layout_alignParentTop="true" android:layout_marginTop="91dp"
+            android:id="@+id/logout"
+            android:onClick="logout"
+    />
 
 </RelativeLayout>

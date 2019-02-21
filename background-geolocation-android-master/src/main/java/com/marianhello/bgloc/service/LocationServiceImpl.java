@@ -32,12 +32,8 @@ import android.os.Process;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.marianhello.bgloc.Config;
-import com.marianhello.bgloc.ConnectivityListener;
-import com.marianhello.bgloc.NotificationHelper;
-import com.marianhello.bgloc.PluginException;
-import com.marianhello.bgloc.PostLocationTask;
-import com.marianhello.bgloc.ResourceResolver;
+import android.util.Log;
+import com.marianhello.bgloc.*;
 import com.marianhello.bgloc.data.BackgroundActivity;
 import com.marianhello.bgloc.data.BackgroundLocation;
 import com.marianhello.bgloc.data.ConfigurationDAO;
@@ -56,8 +52,16 @@ import com.marianhello.bgloc.sync.SyncService;
 import com.marianhello.logging.LoggerManager;
 import com.marianhello.logging.UncaughtExceptionLogger;
 
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import org.chromium.content.browser.ThreadUtils;
 import org.json.JSONException;
+import ua.naiksoftware.stomp.Stomp;
+import ua.naiksoftware.stomp.StompClient;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.marianhello.bgloc.service.LocationServiceIntentBuilder.containsCommand;
 import static com.marianhello.bgloc.service.LocationServiceIntentBuilder.containsMessage;
@@ -99,6 +103,8 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
     public static final int MSG_ON_ABORT_REQUESTED = 106;
 
     public static final int MSG_ON_HTTP_AUTHORIZATION = 107;
+
+    public static final int MSG_ON_WEBSOCKET_MESSAGE = 110;
 
     /** notification id */
     private static int NOTIFICATION_ID = 1;
@@ -220,6 +226,12 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
 
         registerReceiver(connectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         NotificationHelper.registerServiceChannel(this);
+
+
+        setToken("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1YzZjMWQ3YzMyYmVlMjA4NmMyNWI2MGYiLCJpYXQiOjE1NTA2ODI2MjMsImV4cCI6MTU1MTU0NjYyM30.IooBVzeTxPQv36_yyOSQVmsAhayHk9p718wf5l2SsES9lUBRqs15X5toEivIa1MEm4EU_D4d3k4Zd0MCEtureQ");
+        setUserID("5c6c1d7c32bee2086c25b60f");
+        setServerIP("192.168.1.41");
+        openWebSocket();
     }
 
     @Override
@@ -718,4 +730,111 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
     public static @Nullable LocationTransform getLocationTransform() {
         return sLocationTransform;
     }
+
+
+    public static StompClient stompClient;
+    public static String TOKEN;
+    public static String userID;
+    public static String serverIP;
+
+    private List<String> usersIDs;
+    private CompositeDisposable compositeDisposableUserSub = new CompositeDisposable();
+
+
+    public void setToken(String token) {
+        TOKEN = token;
+    }
+
+
+    public void setUserID(String id) {
+        userID = id;
+    }
+
+
+    public void setServerIP(String IP) {
+        serverIP = IP;
+    }
+
+
+    public void setUsers(List<String> ids) {
+        usersIDs = ids;
+    }
+
+
+    public void openWebSocket() {
+        if(!isNetworkAvailable())
+            return;
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + TOKEN);
+
+        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP,
+                "ws://"+serverIP+":8080/send", headers);
+        stompClient.connect();
+
+        Disposable dispLifecycle = stompClient.lifecycle().subscribe(lifecycleEvent -> {
+            switch (lifecycleEvent.getType()) {
+
+                case OPENED:
+                    Log.e("WEBSOCKET", "Stomp connection opened");
+
+                    subscribeAllUsers();
+                    break;
+
+                case ERROR:
+                    Log.e("WEBSOCKET", "Error", lifecycleEvent.getException());
+                    break;
+
+                case CLOSED:
+                    Log.e("WEBSOCKET", "Stomp connection closed");
+                    break;
+            }
+        });
+
+    }
+
+
+     public void subscribeAllUsers() {
+
+         subscribeUser("5c5d6da932bee21b60fca64b");
+         subscribeUser("5c5d6f9232bee21b60fca64c");
+
+      /*  if(!stompClient.isConnected())
+            return;
+
+        for(int i = 0; i< usersIDs.size(); i++) {
+            subscribeUser(usersIDs.get(i));
+        }*/
+    }
+
+
+    public void unSubscribeAllUsers() {
+       compositeDisposableUserSub.clear();
+    }
+
+    private void subscribeUser(String id) {
+        //if(!stompClient.isConnected())
+        //    return;
+
+        Disposable subscribe = stompClient.topic("/topic/get/"+ id).subscribe(topicMessage -> {
+            Log.e("WEBSOCKET", topicMessage.getPayload());
+            //prepareLocationAndSend(topicMessage.getPayload());
+        }, error ->{
+            Log.e("WEBSOCKET", error.getMessage());
+        });
+
+        compositeDisposableUserSub.add(subscribe);
+
+    }
+
+
+
+    private void prepareLocationAndSend(String payload) {
+        Bundle bundle = new Bundle();
+        bundle.putInt("action", MSG_ON_WEBSOCKET_MESSAGE);
+        bundle.putString("payload", payload);
+        broadcastMessage(bundle);
+    }
+
+
 }
