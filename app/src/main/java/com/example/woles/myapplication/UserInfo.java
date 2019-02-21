@@ -10,6 +10,7 @@ public class UserInfo {
     static String email;
     static String username;
     static String token;
+    static String trackID;
     static boolean isActive;
     static SharedPreferences sharedPref;
 
@@ -25,6 +26,7 @@ public class UserInfo {
         SharedPreferences sharedPref = getPref(context);
 
         userID = sharedPref.getString("userID", "");
+        trackID = sharedPref.getString("trackID", "");
         token = sharedPref.getString("token", "");
         email = sharedPref.getString("userEmail", "");
         username = sharedPref.getString("username", "");
@@ -70,5 +72,9 @@ public class UserInfo {
 
     public static boolean isActive() {
         return isActive;
+    }
+
+    public static String getTrackID() {
+        return trackID;
     }
 }

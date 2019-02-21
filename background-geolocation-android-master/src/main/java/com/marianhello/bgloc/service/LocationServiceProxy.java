@@ -92,4 +92,12 @@ public class LocationServiceProxy implements LocationService, LocationServiceInf
     private void executeIntentCommand(Intent intent) {
         mContext.startService(intent);
     }
+
+    @Override
+    public void setUserInfoAndOpenWS(String info) {
+        Intent intent = mIntentBuilder
+                .setCommand(CommandId.USER_INFO, info)
+                .build();
+        executeIntentCommand(intent);
+    }
 }

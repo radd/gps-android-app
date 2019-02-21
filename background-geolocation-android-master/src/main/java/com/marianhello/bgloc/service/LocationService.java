@@ -15,6 +15,8 @@ public interface LocationService {
     void startHeadlessTask();
     void executeProviderCommand(int command, int arg);
 
+    void setUserInfoAndOpenWS(String info);
+
    /* void setToken(String token);
     void setUserID(String id);
     void setServerIP(String IP);

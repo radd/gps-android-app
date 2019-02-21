@@ -56,6 +56,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import org.chromium.content.browser.ThreadUtils;
 import org.json.JSONException;
+import org.json.JSONObject;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 
@@ -226,12 +227,6 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
 
         registerReceiver(connectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         NotificationHelper.registerServiceChannel(this);
-
-
-        setToken("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1YzZjMWQ3YzMyYmVlMjA4NmMyNWI2MGYiLCJpYXQiOjE1NTA2ODI2MjMsImV4cCI6MTU1MTU0NjYyM30.IooBVzeTxPQv36_yyOSQVmsAhayHk9p718wf5l2SsES9lUBRqs15X5toEivIa1MEm4EU_D4d3k4Zd0MCEtureQ");
-        setUserID("5c6c1d7c32bee2086c25b60f");
-        setServerIP("192.168.1.41");
-        openWebSocket();
     }
 
     @Override
@@ -331,6 +326,9 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
                     break;
                 case CommandId.START_HEADLESS_TASK:
                     startHeadlessTask();
+                    break;
+                case CommandId.USER_INFO:
+                    setUserInfoAndOpenWS((String) arg);
                     break;
             }
         } catch (Exception e) {
@@ -731,33 +729,37 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
         return sLocationTransform;
     }
 
-
-    public static StompClient stompClient;
-    public static String TOKEN;
-    public static String userID;
-    public static String serverIP;
+    public static volatile StompClient stompClient;
+    public static volatile String token;
+    public static volatile String userID;
+    public static volatile String trackID;
+    public static volatile String WS_URL;
+    public static volatile String usersURL;
 
     private List<String> usersIDs;
+
     private CompositeDisposable compositeDisposableUserSub = new CompositeDisposable();
 
 
-    public void setToken(String token) {
-        TOKEN = token;
-    }
+    @Override
+    public void setUserInfoAndOpenWS(String info) {
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(info);
 
+            token = jsonObject.getString("token");
+            userID = jsonObject.getString("userID");
+            trackID = jsonObject.getString("trackID");
+            WS_URL = jsonObject.getString("WS_URL");
+            usersURL = jsonObject.getString("usersURL");
 
-    public void setUserID(String id) {
-        userID = id;
-    }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
+        if(stompClient == null || !stompClient.isConnected())
+            openWebSocket();
 
-    public void setServerIP(String IP) {
-        serverIP = IP;
-    }
-
-
-    public void setUsers(List<String> ids) {
-        usersIDs = ids;
     }
 
 
@@ -765,11 +767,14 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
         if(!isNetworkAvailable())
             return;
 
+        if(token.isEmpty() || WS_URL.isEmpty())
+            return;
+
         Map<String, String> headers = new HashMap<>();
-        headers.put("Authorization", "Bearer " + TOKEN);
+        headers.put("Authorization", "Bearer " + token);
 
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP,
-                "ws://"+serverIP+":8080/send", headers);
+                WS_URL, headers);
         stompClient.connect();
 
         Disposable dispLifecycle = stompClient.lifecycle().subscribe(lifecycleEvent -> {
@@ -795,6 +800,11 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
 
 
      public void subscribeAllUsers() {
+
+
+
+
+
 
          subscribeUser("5c5d6da932bee21b60fca64b");
          subscribeUser("5c5d6f9232bee21b60fca64c");

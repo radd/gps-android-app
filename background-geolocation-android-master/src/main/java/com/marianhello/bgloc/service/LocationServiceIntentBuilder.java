@@ -38,7 +38,9 @@ import java.lang.annotation.RetentionPolicy;
         CommandId.START_FOREGROUND,
         CommandId.CONFIGURE,
         CommandId.REGISTER_HEADLESS_TASK,
-        CommandId.START_HEADLESS_TASK
+        CommandId.START_HEADLESS_TASK,
+
+        CommandId.USER_INFO
 })
 @Retention(RetentionPolicy.SOURCE)
 @interface CommandId {
@@ -50,6 +52,8 @@ import java.lang.annotation.RetentionPolicy;
     int CONFIGURE = 4;
     int REGISTER_HEADLESS_TASK = 5;
     int START_HEADLESS_TASK = 6;
+
+    int USER_INFO = 7;
 }
 
 public class LocationServiceIntentBuilder {
@@ -92,7 +96,7 @@ public class LocationServiceIntentBuilder {
         }
 
         public Object getArgument() {
-            return mParcelableArg;
+            return mParcelableArg != null ? mParcelableArg : mStringArg;
         }
 
         public Bundle toBundle() {
@@ -117,7 +121,7 @@ public class LocationServiceIntentBuilder {
             int argumentType = bundle.getInt(KEY_COMMAND_ARGUMENT_TYPE);
 
             if (argumentType == ARGUMENT_TYPE_STRING) {
-                return new Command(commandId, bundle.getString(KEY_COMMAND_ARGUMENT_TYPE));
+                return new Command(commandId, bundle.getString(KEY_COMMAND_ARGUMENT));
             } else if (argumentType == ARGUMENT_TYPE_PARCELABLE) {
                 // Important: don't remove Parcelable cast
                 // required for Java 1.8 compatibility

@@ -19,6 +19,8 @@ import com.marianhello.bgloc.WebSocketTrans;
 import com.marianhello.bgloc.data.BackgroundActivity;
 import com.marianhello.bgloc.data.BackgroundLocation;
 import io.reactivex.disposables.CompositeDisposable;
+import org.json.JSONException;
+import org.json.JSONObject;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 import io.reactivex.disposables.Disposable;
@@ -59,7 +61,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         mapFragment.getMapAsync(this);
 
         gpsManager = new GPSManager(getApplicationContext(),this, this);
-        //openWebSocket();
+        openWebSocket();
         //gpsManager.getFacade().start();
 
         startBtn = findViewById(R.id.startBtn);
@@ -293,21 +295,27 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
             gpsManager.getCurrentLocation();
     }
 
-    StompClient mStompClient;
-
-   /* private void openWebSocket() {
-        gpsManager.getFacade().setToken(UserInfo.getToken());
-        gpsManager.getFacade().setUserID(UserInfo.getUserID());
-        gpsManager.getFacade().setServerIP("192.168.1.41");
+    private void openWebSocket() {
 
 
-        gpsManager.getFacade().openWebSocket(new WebSocketTrans() {
-            @Override
-            public void onWebSocketOpened(StompClient stompClient) {
-                mStompClient = stompClient;
-            }
-        });
-    }*/
+        
+
+        JSONObject jsonObject = new JSONObject();
+        String serverIP = "192.168.1.41";
+        try {
+            jsonObject.put("token", UserInfo.getToken());
+            jsonObject.put("userID", UserInfo.getUserID());
+            jsonObject.put("WS_URL", "ws://"+serverIP+":8080/send");
+            jsonObject.put("usersURL", "http://"+serverIP+":8080/api/test/users");
+            jsonObject.put("trackID", UserInfo.getTrackID());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        gpsManager.getFacade().setUserInfoAndOpenWS(jsonObject.toString());
+
+    }
 
 
 

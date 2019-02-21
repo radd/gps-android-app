@@ -499,6 +499,10 @@ public class BackgroundGeolocationFacade {
         return LocationServiceImpl.getLocationTransform();
     }
 
+    public void setUserInfoAndOpenWS(String s) {
+        mService.setUserInfoAndOpenWS(s);
+    }
+
    /* public void setToken(String token) {
         mService.setToken(token);
     }
