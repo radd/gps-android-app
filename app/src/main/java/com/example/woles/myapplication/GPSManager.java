@@ -22,10 +22,10 @@ public class GPSManager {
         facade = new BackgroundGeolocationFacade(context, pluginDelegate);
 
         Config config = new Config();
-        config.setActivitiesInterval(4000);
+        config.setActivitiesInterval(5000);
         config.setDebugging(true);
-        config.setFastestInterval(4000);
-        config.setInterval(4000);
+        config.setFastestInterval(5000);
+        config.setInterval(5000);
         config.setStopOnStillActivity(false);
         config.setLocationProvider(1);
         config.setDesiredAccuracy(1);

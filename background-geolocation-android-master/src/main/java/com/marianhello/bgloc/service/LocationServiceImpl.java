@@ -346,6 +346,9 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
                 case CommandId.UNSUB_ALL:
                     unSubscribeAllUsers();
                     break;
+                case CommandId.TRACK_ID:
+                    setTrackID((String) arg);
+                    break;
             }
         } catch (Exception e) {
             logger.error("processCommand: exception", e);
@@ -789,6 +792,11 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
 
     }
 
+    @Override
+    public void setTrackID(String trackID) {
+        this.trackID = trackID;
+    }
+
     public void getUsers() {
         usersIDs = new ArrayList<>();
         try {
@@ -810,13 +818,6 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
                 for(int i = 0;i < jsonBody.length(); i++) {
                     usersIDs.add(jsonBody.getJSONObject(i).getString("_id"));
                 }
-
-            /*    ThreadUtils.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                    }
-                });*/
 
                 Bundle bundle = new Bundle();
                 bundle.putInt("action", MSG_ON_USERS);
@@ -878,16 +879,6 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
              if(!usersIDs.get(i).equals(userID))
                 subscribeUser(usersIDs.get(i));
          }
-
-         //subscribeUser("5c5d6da932bee21b60fca64b");
-         //subscribeUser("5c5d6f9232bee21b60fca64c");
-
-      /*  if(!stompClient.isConnected())
-            return;
-
-        for(int i = 0; i< usersIDs.size(); i++) {
-            subscribeUser(usersIDs.get(i));
-        }*/
     }
 
     @Override

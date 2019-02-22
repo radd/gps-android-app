@@ -54,6 +54,10 @@
         <activity android:name=".SubsActivity"
                   android:label="Subs">
         </activity>
+
+        <activity android:name=".NewTrackActivity"
+                  android:label="Nowa trasa">
+        </activity>
     </application>
 
 </manifest>

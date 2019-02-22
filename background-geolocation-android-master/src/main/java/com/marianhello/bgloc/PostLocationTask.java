@@ -149,6 +149,7 @@ public class PostLocationTask {
             //jsonLocations.put(mConfig.getTemplate().locationToJson(location));
 
             jsonObject.put("userID", LocationServiceImpl.userID);
+            jsonObject.put("trackID", LocationServiceImpl.trackID);
             jsonObject.put("timestamp", System.currentTimeMillis());
             jsonObject.put("latitude", String.valueOf(location.getLatitude()));
             jsonObject.put("longitude", String.valueOf(location.getLongitude()));

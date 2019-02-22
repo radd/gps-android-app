@@ -44,6 +44,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     private boolean isSubAll = false;
     private Button subBtn;
 
+    public static String serverIP = "192.168.1.41";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,78 +89,27 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
             }
         });
         subBtn = findViewById(R.id.subBtn);
-     /*   StompClient mStompClient;
-
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Authorization", "Bearer " + UserInfo.getToken());
-
-        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP,
-                "ws://192.168.1.41:8080/send", headers);
-        mStompClient.connect();
-
-
-        Disposable dispLifecycle = mStompClient.lifecycle().subscribe(lifecycleEvent -> {
-            switch (lifecycleEvent.getType()) {
-
-                case OPENED:
-                    Log.e("WEBSOCKET", "Stomp connection opened");
-                    break;
-
-                case ERROR:
-                    Log.e("WEBSOCKET", "Error", lifecycleEvent.getException());
-                    break;
-
-                case CLOSED:
-                    Log.e("WEBSOCKET", "Stomp connection closed");
-                    break;
-            }
-        });
-
-
-
-        Disposable dispTopic = mStompClient.topic("/topic/get/5c5d6da932bee21b60fca64b").subscribe(topicMessage -> {
-            Log.e("WEBSOCKET", topicMessage.getPayload());
-           // mStompClient.send("/ws/send/5c5d6da932bee21b60fca64", "My first STOMP message!").subscribe();
-        }, error ->{
-            Log.e("WEBSOCKET", error.getMessage());
-        });
-*/
-
-/*        Disposable dispTopic2 = mStompClient.topic("/topic/get/5c5d6da932bee21b60fca64").subscribe(topicMessage -> {
-            Log.e("WEBSOCKET", topicMessage.getPayload());
-        }, error ->{
-            Log.e("WEBSOCKET", error.getMessage());
-        });*/
-
-
-
-
-//        new Thread(new Runnable() {
-//            public void run() {
-//
-//
-//
-//            }
-//        }).start();
 
     }
 
     public void menuBtn_onClick(View view) {
-        //Intent intent = new Intent(this, SubsActivity.class);
-        //startActivity(intent);
+        Intent intent = new Intent(this, MenuActivity.class);
+        startActivity(intent);
+    }
+
+    public void subBtn_onClick(View view) {
         if(isSubAll) {
             gpsManager.getFacade().unSubAll();
-            subBtn.setText("Obesrwuj");
+            subBtn.setText("Obserwuj");
             isSubAll = false;
         }
         else {
             isSubAll = true;
             gpsManager.getFacade().subAll();
-            subBtn.setText("Nie obesrwuj");
+            subBtn.setText("Nie obserwuj");
         }
 
     }
-
 
     @Override
     protected void onResume() {
@@ -243,7 +194,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         mainMarker.setPosition(latLng);
 
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.0f));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.0f));
     }
 
     private void setChangeLocation(BackgroundLocation location) {
@@ -316,11 +267,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
 
     private void openWebSocket() {
 
-
-
-
         JSONObject jsonObject = new JSONObject();
-        String serverIP = "192.168.1.41";
+
         try {
             jsonObject.put("token", UserInfo.getToken());
             jsonObject.put("userID", UserInfo.getUserID());
@@ -361,11 +309,6 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
-
-
-
 
     }
 

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+               tools:context="com.example.woles.myapplication.MenuActivity">
+
+    <TextView
+            android:text="Nazwa trasy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/nameInput"
+            android:id="@+id/textView"
+            android:layout_above="@+id/nameInput"
+            android:layout_marginBottom="-38dp"/>
+
+    <EditText
+            android:layout_width="314dp"
+            android:layout_height="59dp"
+            android:inputType="textPersonName"
+            android:text=""
+            android:ems="10"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="38dp"
+            android:id="@+id/nameInput"
+            android:layout_centerHorizontal="true"/>
+
+    <Button
+            android:text="Zapisz"
+            android:layout_width="315dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="122dp"
+            android:layout_alignStart="@+id/nameInput"
+            android:id="@+id/saveBtn"
+            android:onClick="saveBtn_OnClick"
+    />
+</RelativeLayout>

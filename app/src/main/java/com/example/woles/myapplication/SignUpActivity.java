@@ -122,7 +122,8 @@ public class SignUpActivity extends AppCompatActivity {
                             }
                         });
 
-
+                progressDialog.dismiss();
+                alertDialog.show();
             }
             else {
 

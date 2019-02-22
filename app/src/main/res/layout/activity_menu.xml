@@ -33,5 +33,15 @@
             android:id="@+id/logout"
             android:onClick="logout"
     />
+    <Button
+            android:text="Rozpocznij nową trasę"
+            android:layout_width="255dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="173dp"
+            android:layout_alignStart="@+id/logout"
+            android:id="@+id/trackBtn"
+            android:onClick="trackBtn_OnClick"
+    />
 
 </RelativeLayout>

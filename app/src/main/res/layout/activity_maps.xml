@@ -21,7 +21,17 @@
             android:id="@+id/controls"
                   android:layout_alignParentBottom="true"
     >
-
+        <Button
+                android:text="Obserwuj"
+                android:textColor="#FFFFFF"
+                android:background="@color/colorPrimary"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/subBtn"
+                android:clickable="true"
+                android:onClick="subBtn_onClick"
+        />
 
         <Button
                 android:text="Start"
@@ -34,14 +44,16 @@
                 android:onClick="startBtn_OnClick"
                 android:clickable="true"
         />
+
+
         <Button
-                android:text="Obserwuj"
+                android:text="Menu"
                 android:textColor="#FFFFFF"
                 android:background="@color/colorPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:id="@+id/subBtn"
+                android:id="@+id/menuBtn"
                 android:clickable="true"
                 android:onClick="menuBtn_onClick"
         />

@@ -18,6 +18,7 @@ public interface LocationService {
     void setUserInfoAndOpenWS(String info);
     void unSubscribeAllUsers();
     void subscribeAllUsers();
+    void setTrackID(String trackID);
 
    /* void setToken(String token);
     void setUserID(String id);

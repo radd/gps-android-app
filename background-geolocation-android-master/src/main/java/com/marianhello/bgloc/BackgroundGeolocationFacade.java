@@ -529,6 +529,11 @@ public class BackgroundGeolocationFacade {
         mService.subscribeAllUsers();
     }
 
+    public void setTrackID(String trackID) {
+        mService.setTrackID(trackID);
+    }
+
+
    /* public void setToken(String token) {
         mService.setToken(token);
     }

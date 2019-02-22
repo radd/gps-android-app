@@ -1,6 +1,7 @@
 package com.example.woles.myapplication;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,92 +23,50 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class MenuActivity extends AppCompatActivity {
+public class NewTrackActivity extends AppCompatActivity {
 
-    EditText mURL;
-    Button trackBtn;
+    EditText nameInput;
+    Button saveBtn;
     AlertDialog alertDialog;
     ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_menu);
+        setContentView(R.layout.activity_new_track);
+        saveBtn = (Button) findViewById(R.id.saveBtn);
+        nameInput = (EditText) findViewById(R.id.nameInput);
+
         alertDialog = new AlertDialog.Builder(this).create();
         progressDialog = new ProgressDialog(this);
 
-        mURL = (EditText) findViewById(R.id.URL);
-        trackBtn = (Button) findViewById(R.id.trackBtn);
-
-        setTrackButton();
-
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        setTrackButton();
-    }
-
-    private void setTrackButton() {
-        SharedPreferences sharedPref = UserInfo.getPref(this);
-
-        if(UserInfo.getTrackID()== null || UserInfo.getTrackID().isEmpty()) {
-            trackBtn.setText("Utwórz nową trasę");
-        }
-        else {
-            trackBtn.setText("Zakończ trasę: \"" + UserInfo.getTrackName() + "\"");
-        }
-    }
-
-    public void save(View view) {
-        String url = mURL.getText().toString();
-        MapsActivity.gpsManager.saveURL(url);
-
-        finish();
-    }
-
-    public void logout(View view) {
-        UserInfo.logout();
-        UserInfo.redirectToLogin(this);
-        finish();
-    }
-
-    public void trackBtn_OnClick(View view) {
-        if(UserInfo.getTrackID()== null || UserInfo.getTrackID().isEmpty()) {
-            createTrack();
-        }
-        else {
-
+    public void saveBtn_OnClick(View view) {
+        if(!nameInput.getText().equals("")) {
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressDialog.setTitle("Zakończ trasę");
+            progressDialog.setTitle("Zapisywanie");
             progressDialog.setMessage("Czekaj...");
             progressDialog.setIndeterminate(true);
             progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
-
             new Thread(new Runnable() {
                 public void run() {
-                    finishTrack();
+                    createTrack(nameInput.getText().toString());
                 }
             }).start();
 
         }
     }
 
+    private void createTrack(String trackName) {
 
-    private void createTrack() {
-        Intent intent = new Intent(this, NewTrackActivity.class);
-        startActivity(intent);
-    }
-
-    private void finishTrack() {
         SharedPreferences sharedPref = UserInfo.getPref(this);
         SharedPreferences.Editor editor = sharedPref.edit();
 
         JSONObject json = new JSONObject();
         try {
-            json.put("trackID", UserInfo.getTrackID());
+            json.put("name", trackName);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -116,7 +75,7 @@ public class MenuActivity extends AppCompatActivity {
         Log.e("LOG", ""+body);
 
         try {
-            HttpURLConnection conn = (HttpURLConnection) new URL("http://"+MapsActivity.serverIP+":8080/api/test/finish_track").openConnection();
+            HttpURLConnection conn = (HttpURLConnection) new URL("http://"+MapsActivity.serverIP+":8080/api/test/create_track").openConnection();
             conn.setDoOutput(true);
             conn.setFixedLengthStreamingMode(body.length());
             conn.setRequestMethod("POST");
@@ -137,33 +96,49 @@ public class MenuActivity extends AppCompatActivity {
 
             //Log.e("LOG", ""+ conn.getResponseCode());
 
-            if(conn.getResponseCode() == 200){
-                editor.putString("trackID", "");
-                editor.putString("trackName", "");
+            if(conn.getResponseCode() == 201){
+
+                BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+                StringBuilder sb = new StringBuilder();
+                String output;
+                while ((output = br.readLine()) != null) {
+                    sb.append(output);
+                }
+                JSONObject jsonBody = new JSONObject(sb.toString());
+                JSONObject data = jsonBody.getJSONObject("data");
+
+                String trackID = data.getString("_id");
+                String name = data.getString("name");
+
+                editor.putString("trackID", trackID);
+                editor.putString("trackName", name);
                 editor.commit();
                 UserInfo.loadInfo(this);
-
+                MapsActivity.gpsManager.getFacade().setTrackID(trackID);
 
                 alertDialog.setTitle("");
-                alertDialog.setMessage("Traza została zakończona");
+                alertDialog.setMessage("Traza została utworzona");
                 alertDialog.setCancelable(false);
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
 
                                 dialog.dismiss();
-
+                                Intent intent = new Intent(NewTrackActivity.this, MenuActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                                finish();
                             }
                         });
 
                 ThreadUtils.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        setTrackButton();
                         progressDialog.dismiss();
                         alertDialog.show();
                     }
                 });
+
 
             }
             else {
@@ -174,7 +149,10 @@ public class MenuActivity extends AppCompatActivity {
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
     }
+
 }

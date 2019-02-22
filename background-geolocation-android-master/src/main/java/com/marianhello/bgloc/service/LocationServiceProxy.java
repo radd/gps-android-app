@@ -116,4 +116,12 @@ public class LocationServiceProxy implements LocationService, LocationServiceInf
                 .build();
         executeIntentCommand(intent);
     }
+
+    @Override
+    public void setTrackID(String trackID) {
+        Intent intent = mIntentBuilder
+                .setCommand(CommandId.TRACK_ID, trackID)
+                .build();
+        executeIntentCommand(intent);
+    }
 }
