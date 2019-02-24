@@ -1,7 +1,9 @@
 package com.marianhello.bgloc;
 
+import android.util.Log;
 import com.marianhello.bgloc.data.BackgroundLocation;
 import com.marianhello.bgloc.data.LocationDAO;
+import com.marianhello.bgloc.service.LocationService;
 import com.marianhello.bgloc.service.LocationServiceImpl;
 import com.marianhello.logging.LoggerManager;
 
@@ -40,6 +42,8 @@ public class PostLocationTask {
 
     private org.slf4j.Logger logger;
 
+    private LocationService mService;
+
     public interface PostLocationTaskListener
     {
         void onSyncRequested();
@@ -57,6 +61,12 @@ public class PostLocationTask {
         mConnectivityListener = connectivityListener;
 
         mExecutor = Executors.newSingleThreadExecutor();
+    }
+
+    public PostLocationTask(LocationService service, LocationDAO dao, PostLocationTaskListener taskListener,
+                            ConnectivityListener connectivityListener) {
+       this(dao, taskListener, connectivityListener);
+        mService = service;
     }
 
     public void setConfig(Config config) {
@@ -124,7 +134,8 @@ public class PostLocationTask {
 
                 return; // if posted successfully do nothing more
             } else {
-                mLocationDAO.updateLocationForSync(locationId);
+                //mLocationDAO.updateLocationForSync(locationId);
+                mService.openWebSocket();
             }
         } else {
             mLocationDAO.updateLocationForSync(locationId);
@@ -167,8 +178,18 @@ public class PostLocationTask {
             return false;
 
 
-        LocationServiceImpl.stompClient.send("/ws/send/" + LocationServiceImpl.userID,
-                jsonObject.toString()).subscribe();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                LocationServiceImpl.stompClient.send("/ws/send/" + LocationServiceImpl.userID,
+                        jsonObject.toString()).subscribe();
+                try {
+                    Log.e("LOG", "Delay: " + (System.currentTimeMillis() - jsonObject.getLong("timestamp")));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
 
 

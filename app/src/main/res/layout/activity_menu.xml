@@ -43,5 +43,15 @@
             android:id="@+id/trackBtn"
             android:onClick="trackBtn_OnClick"
     />
+    <Button
+            android:text="Odśwież połączenie z serverem"
+            android:layout_width="312dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="194dp"
+            android:layout_alignStart="@+id/logout"
+            android:id="@+id/refresh"
+            android:onClick="refresh_onClick"
+    />
 
 </RelativeLayout>

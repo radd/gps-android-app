@@ -7,6 +7,8 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -43,8 +45,9 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     private boolean isRunning;
     private boolean isSubAll = false;
     private Button subBtn;
+    private TextView connState;
 
-    public static String serverIP = "192.168.1.41";
+    public static String serverIP = "40.115.21.196";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +91,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
 
             }
         });
-        subBtn = findViewById(R.id.subBtn);
+        subBtn = (Button) findViewById(R.id.subBtn);
+        connState = (TextView) findViewById(R.id.connectionInfo);
 
     }
 
@@ -272,8 +276,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         try {
             jsonObject.put("token", UserInfo.getToken());
             jsonObject.put("userID", UserInfo.getUserID());
-            jsonObject.put("WS_URL", "ws://"+serverIP+":8080/send");
-            jsonObject.put("usersURL", "http://"+serverIP+":8080/api/test/users");
+            jsonObject.put("WS_URL", "ws://"+serverIP+":8080/connect-ws");
+            jsonObject.put("usersURL", "http://"+serverIP+":8080/api/users");
             jsonObject.put("trackID", UserInfo.getTrackID());
 
         } catch (JSONException e) {
@@ -381,6 +385,12 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         }
         polylines.clear();
 
+    }
+
+    @Override
+    public void onWebSocketState(String state) {
+        String prefix = "WS serwer: ";
+        connState.setText(prefix + state);
     }
 
 }

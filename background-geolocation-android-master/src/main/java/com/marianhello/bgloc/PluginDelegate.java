@@ -21,4 +21,5 @@ public interface PluginDelegate {
 
     void onWebSocketMessage(String payload);
     void clearMap();
+    void onWebSocketState(String state);
 }

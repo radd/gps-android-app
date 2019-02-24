@@ -41,6 +41,7 @@ import java.lang.annotation.RetentionPolicy;
         CommandId.START_HEADLESS_TASK,
 
         CommandId.USER_INFO,
+        CommandId.OPEN_WEBSOCKET,
         CommandId.SUB_ALL,
         CommandId.UNSUB_ALL,
         CommandId.TRACK_ID
@@ -60,6 +61,7 @@ import java.lang.annotation.RetentionPolicy;
     int SUB_ALL = 8;
     int UNSUB_ALL = 9;
     int TRACK_ID = 10;
+    int OPEN_WEBSOCKET = 11;
 }
 
 public class LocationServiceIntentBuilder {

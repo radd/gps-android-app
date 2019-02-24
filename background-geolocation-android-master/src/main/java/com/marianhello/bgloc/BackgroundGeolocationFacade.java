@@ -187,6 +187,12 @@ public class BackgroundGeolocationFacade {
                     mDelegate.clearMap();
                     return;
                 }
+                case LocationServiceImpl.MSG_ON_WEBSOCKET_EVENT: {
+                    logger.debug("Received MSG_ON_WEBSOCKET_EVENT");
+                    String state = bundle.getString("payload");
+                    mDelegate.onWebSocketState(state);
+                    return;
+                }
             }
         }
     };
@@ -533,6 +539,9 @@ public class BackgroundGeolocationFacade {
         mService.setTrackID(trackID);
     }
 
+    public void openWebSocket() {
+        mService.openWebSocket();
+    }
 
    /* public void setToken(String token) {
         mService.setToken(token);

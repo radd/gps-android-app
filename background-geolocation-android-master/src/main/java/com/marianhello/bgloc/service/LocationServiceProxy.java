@@ -124,4 +124,12 @@ public class LocationServiceProxy implements LocationService, LocationServiceInf
                 .build();
         executeIntentCommand(intent);
     }
+
+    @Override
+    public void openWebSocket() {
+        Intent intent = mIntentBuilder
+                .setCommand(CommandId.OPEN_WEBSOCKET)
+                .build();
+        executeIntentCommand(intent);
+    }
 }

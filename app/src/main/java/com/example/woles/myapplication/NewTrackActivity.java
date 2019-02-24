@@ -75,7 +75,7 @@ public class NewTrackActivity extends AppCompatActivity {
         Log.e("LOG", ""+body);
 
         try {
-            HttpURLConnection conn = (HttpURLConnection) new URL("http://"+MapsActivity.serverIP+":8080/api/test/create_track").openConnection();
+            HttpURLConnection conn = (HttpURLConnection) new URL("http://"+MapsActivity.serverIP+":8080/api/track/create_track").openConnection();
             conn.setDoOutput(true);
             conn.setFixedLengthStreamingMode(body.length());
             conn.setRequestMethod("POST");

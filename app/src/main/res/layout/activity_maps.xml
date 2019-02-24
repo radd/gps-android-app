@@ -15,6 +15,15 @@
             android:layout_above="@+id/controls"
     />
 
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="WS serwer: ?"
+              android:layout_alignBottom="@+id/map"
+              android:layout_alignRight="@+id/map"
+              android:padding="2dp"
+              android:id="@+id/connectionInfo"
+    />
+
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="60dp"
                   android:orientation="horizontal"

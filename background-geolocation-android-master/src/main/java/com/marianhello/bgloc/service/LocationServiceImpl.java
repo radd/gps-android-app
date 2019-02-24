@@ -116,6 +116,7 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
     public static final int MSG_ON_WEBSOCKET_MESSAGE = 110;
     public static final int MSG_ON_USERS = 111;
     public static final int MSG_ON_CLEAR_MAP = 112;
+    public static final int MSG_ON_WEBSOCKET_EVENT = 113;
 
     /** notification id */
     private static int NOTIFICATION_ID = 1;
@@ -212,7 +213,7 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
 
         mLocationDAO = DAOFactory.createLocationDAO(this);
 
-        mPostLocationTask = new PostLocationTask(mLocationDAO,
+        mPostLocationTask = new PostLocationTask(this, mLocationDAO,
                 new PostLocationTask.PostLocationTaskListener() {
             @Override
             public void onRequestedAbortUpdates() {
@@ -339,6 +340,9 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
                     break;
                 case CommandId.USER_INFO:
                     setUserInfoAndOpenWS((String) arg);
+                    break;
+                case CommandId.OPEN_WEBSOCKET:
+                    openWebSocket();
                     break;
                 case CommandId.SUB_ALL:
                     subscribeAllUsers();
@@ -782,10 +786,7 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
                 //if(usersIDs.size() == 0) {
                     getUsers();
                 //}
-
-
-                if(stompClient == null || !stompClient.isConnected())
-                    openWebSocket();
+                openWebSocket();
             }
         }).start();
 
@@ -834,8 +835,11 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
     }
 
 
-
+    @Override
     public void openWebSocket() {
+        if(!(stompClient == null || !stompClient.isConnected()))
+            return;
+
         if(!isNetworkAvailable())
             return;
 
@@ -847,26 +851,28 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
 
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP,
                 WS_URL, headers);
-        stompClient.connect();
 
         Disposable dispLifecycle = stompClient.lifecycle().subscribe(lifecycleEvent -> {
             switch (lifecycleEvent.getType()) {
 
                 case OPENED:
                     Log.e("WEBSOCKET", "Stomp connection opened");
-
-                    //subscribeAllUsers();
+                    webSocketInfo("Połączono");
                     break;
 
                 case ERROR:
                     Log.e("WEBSOCKET", "Error", lifecycleEvent.getException());
+                    webSocketInfo("Błąd");
                     break;
 
                 case CLOSED:
                     Log.e("WEBSOCKET", "Stomp connection closed");
+                    webSocketInfo("Nie połączono");
                     break;
             }
         });
+
+        stompClient.connect();
 
     }
 
@@ -914,5 +920,11 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
         broadcastMessage(bundle);
     }
 
+    private void webSocketInfo(String state) {
+        Bundle bundle = new Bundle();
+        bundle.putInt("action", MSG_ON_WEBSOCKET_EVENT);
+        bundle.putString("payload", state);
+        broadcastMessage(bundle);
+    }
 
 }

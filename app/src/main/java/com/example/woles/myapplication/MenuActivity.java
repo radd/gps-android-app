@@ -116,7 +116,7 @@ public class MenuActivity extends AppCompatActivity {
         Log.e("LOG", ""+body);
 
         try {
-            HttpURLConnection conn = (HttpURLConnection) new URL("http://"+MapsActivity.serverIP+":8080/api/test/finish_track").openConnection();
+            HttpURLConnection conn = (HttpURLConnection) new URL("http://"+MapsActivity.serverIP+":8080/api/track/finish_track").openConnection();
             conn.setDoOutput(true);
             conn.setFixedLengthStreamingMode(body.length());
             conn.setRequestMethod("POST");
@@ -176,5 +176,9 @@ public class MenuActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
+
+    public void refresh_onClick(View view) {
+        MapsActivity.gpsManager.getFacade().openWebSocket();
     }
 }

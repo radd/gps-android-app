@@ -19,6 +19,7 @@ public interface LocationService {
     void unSubscribeAllUsers();
     void subscribeAllUsers();
     void setTrackID(String trackID);
+    void openWebSocket();
 
    /* void setToken(String token);
     void setUserID(String id);

@@ -167,6 +167,6 @@ public abstract class AbstractLocationProvider implements LocationProvider {
 
         int duration = 1000;
 
-        toneGenerator.startTone(name, duration);
+        //toneGenerator.startTone(name, duration);
     }
 }
