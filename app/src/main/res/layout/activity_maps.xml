@@ -15,6 +15,136 @@
             android:layout_above="@+id/controls"
     />
 
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:background="@color/colorPrimary"
+                    android:layout_below="@+id/infoBar"
+                    android:translationY="-110dp"
+                    android:id="@+id/moreInfoBar"
+    >
+
+
+    </RelativeLayout>
+
+
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/map"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:background="#FF3F51B5"
+                    android:onClick="showMoreInfo"
+                    android:id="@+id/infoBar"
+    >
+
+        <LinearLayout android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical"
+                      android:layout_marginLeft="20dp"
+                      android:gravity="center"
+                      android:layout_alignParentLeft="true"
+                      android:layout_alignBottom="@+id/speedUnit"
+        >
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="248m"
+                      android:textSize="22sp"
+                      android:id="@+id/altitude"
+                      android:textColor="@color/mapInfoColor"
+            />
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="wysokość"
+                      android:textSize="12sp"
+                      android:layout_below="@+id/altitude"
+                      android:id="@+id/altitudeText"
+                      android:textColor="@color/mapInfoColor"
+            />
+
+        </LinearLayout>
+
+
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Twoja lokalizacja"
+                  android:textSize="16sp"
+                  android:layout_centerHorizontal="true"
+                  android:id="@+id/name"
+                  android:textColor="@color/mapInfoColor"
+                  android:layout_marginTop="0dp"
+        />
+
+
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="56"
+                  android:textSize="30sp"
+                  android:layout_below="@+id/name"
+                  android:layout_centerHorizontal="true"
+                  android:id="@+id/speed"
+                  android:textColor="@color/mapInfoColor"
+        />
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="km/h"
+                  android:textSize="12sp"
+                  android:layout_below="@+id/speed"
+                  android:layout_centerHorizontal="true"
+                  android:id="@+id/speedUnit"
+                  android:textColor="@color/mapInfoColor"
+
+        />
+
+
+        <LinearLayout android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical"
+                      android:layout_marginRight="20dp"
+                      android:gravity="center"
+                      android:layout_alignParentRight="true"
+                      android:layout_alignBottom="@+id/speedUnit"
+        >
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="24m"
+                      android:textSize="22sp"
+                      android:id="@+id/accuraccy"
+                      android:textColor="@color/mapInfoColor"
+
+            />
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="dokładność"
+                      android:textSize="12sp"
+                      android:layout_below="@+id/altitude"
+                      android:id="@+id/accuraccyText"
+                      android:textColor="@color/mapInfoColor"
+            />
+
+        </LinearLayout>
+
+
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="X"
+                  android:textSize="30sp"
+                  android:id="@+id/closeInfo"
+                  android:textColor="@color/mapInfoColor"
+                  android:layout_alignParentRight="true"
+                  android:layout_marginTop="-10dp"
+                  android:layout_marginRight="5dp"
+                  android:onClick="closeInfoBar"
+        />
+
+
+    </RelativeLayout>
+
+
+
+
+
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:text="WS serwer: ?"

@@ -46,6 +46,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     private boolean isSubAll = false;
     private Button subBtn;
     private TextView connState;
+    View infoBar;
+    View moreInfoBar;
 
     public static String serverIP = "40.115.21.196";
 
@@ -93,7 +95,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         });
         subBtn = (Button) findViewById(R.id.subBtn);
         connState = (TextView) findViewById(R.id.connectionInfo);
-
+        infoBar  = findViewById(R.id.infoBar);
+        moreInfoBar  = findViewById(R.id.moreInfoBar);
     }
 
     public void menuBtn_onClick(View view) {
@@ -185,6 +188,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        showInfoBar();
         if(marker.getTag() == null)
             return false;
 
@@ -399,5 +403,48 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         connState.setText(prefix + state);
     }
 
+
+    boolean isInfoBarActive = true;
+    boolean isMoreInfoBarActive = false;
+
+    public void closeInfoBar(View view) {
+        Log.e("LOG", "close info bar");
+        if(!isInfoBarActive)
+            return;
+
+        infoBar.animate().translationY(-infoBar.getHeight());
+        if(isMoreInfoBarActive)
+            moreInfoBar.animate().translationY(-(moreInfoBar.getHeight() + moreInfoBar.getTranslationY()) + (-infoBar.getHeight()));
+        else
+            moreInfoBar.animate().translationY(-(moreInfoBar.getHeight() - 10f) + (-infoBar.getHeight()));
+
+        isInfoBarActive = false;
+        isMoreInfoBarActive = false;
+    }
+
+    public void showInfoBar() {
+        Log.e("LOG", "close info bar");
+        if(isInfoBarActive)
+            return;
+
+        infoBar.animate().translationY(0);
+        if(isMoreInfoBarActive)
+            moreInfoBar.animate().translationY(moreInfoBar.getHeight() + moreInfoBar.getTranslationY() + infoBar.getHeight() -20f);
+        else
+            moreInfoBar.animate().translationY(-moreInfoBar.getHeight());
+
+        isInfoBarActive = true;
+    }
+
+    public void showMoreInfo(View view) {
+        Log.e("LOG", "show more info");
+        if(isMoreInfoBarActive) {
+            moreInfoBar.animate().translationY(-moreInfoBar.getHeight());
+        }
+        else {
+            moreInfoBar.animate().translationY(-10f);
+        }
+        isMoreInfoBarActive = !isMoreInfoBarActive;
+    }
 }
 
