@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import org.chromium.content.browser.ThreadUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +25,6 @@ import java.net.URL;
 
 public class MenuActivity extends AppCompatActivity {
 
-    EditText mURL;
     Button trackBtn;
     AlertDialog alertDialog;
     ProgressDialog progressDialog;
@@ -36,17 +36,28 @@ public class MenuActivity extends AppCompatActivity {
         alertDialog = new AlertDialog.Builder(this).create();
         progressDialog = new ProgressDialog(this);
 
-        mURL = (EditText) findViewById(R.id.URL);
         trackBtn = (Button) findViewById(R.id.trackBtn);
+
+        setUserInfo();
 
         setTrackButton();
 
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
         setTrackButton();
+    }
+
+
+    private void setUserInfo() {
+        TextView username = (TextView) findViewById(R.id.username);
+        TextView email = (TextView) findViewById(R.id.email);
+
+        username.setText(UserInfo.getUsername());
+        email.setText(UserInfo.getEmail());
     }
 
     private void setTrackButton() {
@@ -58,13 +69,6 @@ public class MenuActivity extends AppCompatActivity {
         else {
             trackBtn.setText("Zakończ trasę: \"" + UserInfo.getTrackName() + "\"");
         }
-    }
-
-    public void save(View view) {
-        String url = mURL.getText().toString();
-        MapsActivity.gpsManager.saveURL(url);
-
-        finish();
     }
 
     public void logout(View view) {

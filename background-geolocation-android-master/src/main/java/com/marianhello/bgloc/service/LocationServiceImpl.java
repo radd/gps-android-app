@@ -33,6 +33,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
 import android.util.Log;
+import android.widget.Toast;
 import com.marianhello.bgloc.*;
 import com.marianhello.bgloc.data.BackgroundActivity;
 import com.marianhello.bgloc.data.BackgroundLocation;
@@ -284,6 +285,8 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        //Toast.makeText(this, "onStartCommand", Toast.LENGTH_LONG).show();
+
         if (intent == null) {
             // when service was killed and restarted we will restart service
             start();
@@ -361,6 +364,8 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
 
     @Override
     public synchronized void start() {
+        Toast.makeText(this, "Starting service", Toast.LENGTH_LONG).show();
+
         if (sIsRunning) {
             return;
         }
@@ -410,7 +415,7 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
             mProvider.onStop();
         }
 
-        stopForeground(true);
+        stopForeground();
         //stopSelf();
 
         broadcastMessage(MSG_ON_SERVICE_STOPPED);
@@ -837,14 +842,20 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
 
     @Override
     public void openWebSocket() {
-        if(!(stompClient == null || !stompClient.isConnected()))
+        if(!(stompClient == null || !stompClient.isConnected())) {
+            webSocketInfo("Jest połączony");
             return;
+        }
+        if(!isNetworkAvailable()) {
+            webSocketInfo("Nie połączono z Internetem");
+            return;
+        }
 
-        if(!isNetworkAvailable())
-            return;
 
-        if(token.isEmpty() || WS_URL.isEmpty())
+        if(token.isEmpty() || WS_URL.isEmpty()) {
+            webSocketInfo("Nie znaleziono adresu WS");
             return;
+        }
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);

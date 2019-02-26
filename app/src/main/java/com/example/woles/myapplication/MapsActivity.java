@@ -71,7 +71,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         mapFragment.getMapAsync(this);
 
         gpsManager = new GPSManager(getApplicationContext(),this, this);
-        openWebSocket();
+        setUsersAndOpenWebSocket();
         //gpsManager.getFacade().start();
 
         startBtn = findViewById(R.id.startBtn);
@@ -118,8 +118,14 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     @Override
     protected void onResume() {
         super.onResume();
-        if(gpsManager != null)
+        if(gpsManager != null) {
             gpsManager.getFacade().resume();
+            gpsManager.getFacade().openWebSocket();
+        }
+        else {
+            Log.e("onResume", "gpsManager is null");
+        }
+
         Log.e("GPSAPP", "foreground");
     }
 
@@ -269,7 +275,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
             gpsManager.getCurrentLocation();
     }
 
-    private void openWebSocket() {
+    private void setUsersAndOpenWebSocket() {
 
         JSONObject jsonObject = new JSONObject();
 

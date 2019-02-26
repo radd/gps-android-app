@@ -5,53 +5,94 @@
                 android:layout_height="match_parent"
                tools:context="com.example.woles.myapplication.MenuActivity">
 
-    <Button
+<RelativeLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+            android:id="@+id/userInfo">
+
+
+    <TextView
+            android:text="Konto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Zapisz"
-            android:id="@+id/saveBtn"
             android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:onClick="save"/>
-
-    <EditText
-            android:id="@+id/URL"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/saveBtn"
-            android:layout_toStartOf="@+id/saveBtn"
-            android:hint="IP"
-            android:text="http://192.168.1.43:8080/gpsloc/add"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="28dp"
+            android:id="@+id/textViewAcc"
+            android:textSize="16sp"
     />
+
+    <TextView
+            android:text="Piotr Radziszewski"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/textViewAcc"
+            android:layout_alignLeft="@+id/textViewAcc"
+            android:layout_marginTop="25dp"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/username"
+    />
+    <TextView
+            android:text="email@email.com"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/username"
+            android:layout_alignLeft="@+id/username"
+            android:layout_marginTop="20dp"
+            android:id="@+id/email"
+    />
+
+
     <Button
             android:text="Wyloguj się"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:layout_alignParentStart="true"
-            android:layout_marginStart="28dp" android:layout_alignParentTop="true" android:layout_marginTop="91dp"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/username"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="40dp"
             android:id="@+id/logout"
             android:onClick="logout"
     />
-    <Button
-            android:text="Rozpocznij nową trasę"
-            android:layout_width="255dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="173dp"
-            android:layout_alignStart="@+id/logout"
-            android:id="@+id/trackBtn"
-            android:onClick="trackBtn_OnClick"
-    />
-    <Button
-            android:text="Odśwież połączenie z serverem"
-            android:layout_width="312dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="194dp"
-            android:layout_alignStart="@+id/logout"
-            android:id="@+id/refresh"
-            android:onClick="refresh_onClick"
-    />
+</RelativeLayout>
+
+    <ScrollView android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/userInfo"
+                android:layout_marginTop="30dp"
+    >
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                        android:orientation="vertical"
+
+        >
+
+            <Button
+                    android:text="Rozpocznij nową trasę"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_marginLeft="28dp"
+                    android:layout_marginRight="28dp"
+                    android:id="@+id/trackBtn"
+                    android:onClick="trackBtn_OnClick"
+            />
+            <Button
+                    android:text="Odśwież połączenie z serverem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginLeft="28dp"
+                    android:layout_marginRight="28dp"
+                    android:id="@+id/refresh"
+                    android:onClick="refresh_onClick"
+            />
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
 
 </RelativeLayout>

@@ -178,18 +178,8 @@ public class PostLocationTask {
             return false;
 
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                LocationServiceImpl.stompClient.send("/ws/send/" + LocationServiceImpl.userID,
-                        jsonObject.toString()).subscribe();
-                try {
-                    Log.e("LOG", "Delay: " + (System.currentTimeMillis() - jsonObject.getLong("timestamp")));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        LocationServiceImpl.stompClient.send("/ws/send/" + LocationServiceImpl.userID,
+                jsonObject.toString()).subscribe();
 
 
 
