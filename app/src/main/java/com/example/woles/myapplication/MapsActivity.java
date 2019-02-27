@@ -6,9 +6,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.view.ViewGroup;
+import android.widget.*;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -59,6 +58,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     private TextView name;
     private TextView follow;
     private TextView zoom;
+    private TextView trackName;
+    private View trackInfo;
 
     public static String serverIP = "40.115.21.196";
 
@@ -96,6 +97,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         name  = (TextView) findViewById(R.id.name);
         follow  = (TextView) findViewById(R.id.follow);
         zoom  = (TextView) findViewById(R.id.zoom);
+        trackInfo  = findViewById(R.id.trackInfo);
+        trackName  = (TextView) findViewById(R.id.trackName);
 
         activeUserID = UserInfo.getUserID();
 
@@ -123,6 +126,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
             }
         });
 
+        checkTrack();
     }
 
     public void menuBtn_onClick(View view) {
@@ -195,6 +199,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         else {
             Log.e("onResume", "gpsManager is null");
         }
+        checkTrack();
 
         Log.e("GPSAPP", "foreground");
     }
@@ -591,5 +596,19 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         else
             follow.setText("Śledź");
     }
+
+
+    private void checkTrack() {
+        if(UserInfo.getTrackID().isEmpty()) {
+            trackInfo.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0));
+        }
+        else {
+            trackName.setText("Trasa: " + UserInfo.getTrackName());
+            trackInfo.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
+        }
+    }
+
+
 }
 

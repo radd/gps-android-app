@@ -175,11 +175,42 @@
               android:id="@+id/connectionInfo"
     />
 
+
+
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical"
+                    android:id="@+id/controls"
+                  android:layout_alignParentBottom="true"
+    >
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_above="@+id/controls"
+                      android:id="@+id/trackInfo"
+                      android:orientation="horizontal"
+                      android:background="#FF5262BC"
+                      android:gravity="center"
+        >
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Trasa: "
+                      android:layout_alignBottom="@+id/map"
+                      android:layout_alignRight="@+id/map"
+                      android:padding="3dp"
+                      android:id="@+id/trackName"
+                      android:textColor="@color/mapInfoColor"
+
+
+            />
+
+        </LinearLayout>
+
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="60dp"
                   android:orientation="horizontal"
-            android:id="@+id/controls"
-                  android:layout_alignParentBottom="true"
+                  android:id="@+id/controls2"
     >
         <Button
                 android:text="Obserwuj"
@@ -218,6 +249,6 @@
                 android:onClick="menuBtn_onClick"
         />
     </LinearLayout>
-
+    </LinearLayout>
 
 </RelativeLayout>
