@@ -23,6 +23,27 @@
                     android:id="@+id/moreInfoBar"
     >
 
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Przybliż"
+                  android:textColor="@color/mapInfoColor"
+                  android:padding="20dp"
+                  android:textSize="16sp"
+                  android:layout_marginLeft="20dp"
+                  android:id="@+id/zoom"
+                  android:onClick="zoom_onClick"
+        />
+
+        <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Śledź"
+              android:textColor="@color/mapInfoColor"
+              android:padding="20dp"
+              android:textSize="16sp"
+              android:layout_centerHorizontal="true"
+              android:id="@+id/follow"
+              android:onClick="followUser_onClick"
+    />
 
     </RelativeLayout>
 

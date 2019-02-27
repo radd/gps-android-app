@@ -81,7 +81,7 @@ public class SignUpActivity extends AppCompatActivity {
         Log.e("LOG", ""+body);
 
         try {
-            HttpURLConnection conn = (HttpURLConnection) new URL("http://192.168.1.43:8080/api/auth/sign-up").openConnection();
+            HttpURLConnection conn = (HttpURLConnection) new URL("http://"+MapsActivity.serverIP+":8080/api/auth/sign-up").openConnection();
             conn.setDoOutput(true);
             conn.setFixedLengthStreamingMode(body.length());
             conn.setRequestMethod("POST");

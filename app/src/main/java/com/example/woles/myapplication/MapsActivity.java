@@ -49,12 +49,16 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     private TextView connState;
     View infoBar;
     View moreInfoBar;
-    private String activeUserID;
+    private String activeUserID = "";
+    private String followUserID = "";
+    private boolean isFollow = false;
 
     private TextView altitude;
     private TextView speed;
     private TextView accuracy;
     private TextView name;
+    private TextView follow;
+    private TextView zoom;
 
     public static String serverIP = "40.115.21.196";
 
@@ -82,6 +86,20 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        subBtn = (Button) findViewById(R.id.subBtn);
+        connState = (TextView) findViewById(R.id.connectionInfo);
+        infoBar  = findViewById(R.id.infoBar);
+        moreInfoBar  = findViewById(R.id.moreInfoBar);
+        speed  = (TextView) findViewById(R.id.speed);
+        altitude  = (TextView) findViewById(R.id.altitude);
+        accuracy  = (TextView) findViewById(R.id.accuracy);
+        name  = (TextView) findViewById(R.id.name);
+        follow  = (TextView) findViewById(R.id.follow);
+        zoom  = (TextView) findViewById(R.id.zoom);
+
+        activeUserID = UserInfo.getUserID();
+
+
         gpsManager = new GPSManager(getApplicationContext(),this, this);
         setUsersAndOpenWebSocket();
         //gpsManager.getFacade().start();
@@ -104,16 +122,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
 
             }
         });
-        subBtn = (Button) findViewById(R.id.subBtn);
-        connState = (TextView) findViewById(R.id.connectionInfo);
-        infoBar  = findViewById(R.id.infoBar);
-        moreInfoBar  = findViewById(R.id.moreInfoBar);
-        speed  = (TextView) findViewById(R.id.speed);
-        altitude  = (TextView) findViewById(R.id.altitude);
-        accuracy  = (TextView) findViewById(R.id.accuracy);
-        name  = (TextView) findViewById(R.id.name);
 
-        activeUserID = UserInfo.getUserID();
     }
 
     public void menuBtn_onClick(View view) {
@@ -126,6 +135,9 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
             gpsManager.getFacade().unSubAll();
             subBtn.setText("Obserwuj");
             isSubAll = false;
+
+            activeUserID = UserInfo.getUserID();
+            name.setText("Twoja lokalizacja");
             getCurrentLocation();
         }
         else {
@@ -134,6 +146,43 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
             subBtn.setText("Nie obserwuj");
         }
 
+    }
+
+    public void followUser_onClick(View view) {
+        if(isFollow) {
+            if(followUserID.equals(activeUserID))
+                unfollowUser();
+            else
+                followUser();
+        }
+        else {
+            followUser();
+        }
+
+    }
+
+    public void zoom_onClick(View view) {
+
+        LocationJson loc = lastLocations.get(activeUserID);
+        if(loc == null)
+            return;
+
+        LatLng latLng = new LatLng(Double.valueOf(loc.getLatitude()),
+                Double.valueOf(loc.getLongitude()));
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f));
+    }
+
+    private void followUser() {
+        isFollow = true;
+        followUserID = activeUserID;
+        follow.setText("Zakończ");
+    }
+
+    private void unfollowUser() {
+        isFollow = false;
+        followUserID = "";
+        follow.setText("Śledź");
     }
 
     @Override
@@ -243,10 +292,12 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         if(activeUserID == UserInfo.getUserID())
             setUserInfo(location);
 
+        setMainUserLocation(location);
     }
 
     private void setMainUserLocation(BackgroundLocation location) {
-        setUserInfo(location);
+        if(activeUserID.equals(UserInfo.getUserID()))
+            setUserInfo(location);
 
         LocationJson loc = null;
         if((loc = lastLocations.get(UserInfo.getUserID())) == null) {
@@ -401,6 +452,9 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
                         public void run() {
                             markers.get(user.getID()).setPosition(latLng);
 
+                            if(isFollow && followUserID.equals(user.getID()))
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, mMap.getCameraPosition().zoom));
+
                             if(activeUserID.equals(user.getID()))
                                 setUserInfo(location);
                         }
@@ -504,6 +558,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         altitude.setText(prepareAltitude(location.getAltitude()));
         accuracy.setText(prepareAccuracy(location.getAccuracy()));
 
+        setMoreInfo();
     }
 
     private void setUserInfo(LocationJson location) {
@@ -514,6 +569,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         altitude.setText(prepareAltitude(location.getAltitude()));
         accuracy.setText(prepareAccuracy(location.getAccuracy()));
 
+        setMoreInfo();
     }
 
     private int prepareSpeed(float speed) {
@@ -527,6 +583,13 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
 
     private String prepareAccuracy(float accuracy) {
         return Math.round(accuracy) + "m";
+    }
+
+    private void setMoreInfo() {
+        if(followUserID.equals(activeUserID))
+            follow.setText("Zakończ");
+        else
+            follow.setText("Śledź");
     }
 }
 
