@@ -149,19 +149,25 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     public void subBtn_onClick(View view) {
         if(isSubAll) {
             gpsManager.getFacade().unSubAll();
-            subBtn.setText("Obserwuj");
-            isSubAll = false;
+            subViewReload(false);
 
             activeUserID = UserInfo.getUserID();
             name.setText("Twoja lokalizacja");
             getCurrentLocation();
         }
         else {
-            isSubAll = true;
+            subViewReload(true);
             gpsManager.getFacade().subAll();
-            subBtn.setText("Nie obserwuj");
+
         }
 
+    }
+    private void subViewReload(boolean b) {
+        isSubAll = b;
+        if(isSubAll)
+            subBtn.setText("Nie obserwuj");
+        else
+            subBtn.setText("Obserwuj");
     }
 
     public void followUser_onClick(View view) {
@@ -207,6 +213,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         if(gpsManager != null) {
             gpsManager.getFacade().resume();
             gpsManager.getFacade().openWebSocket();
+
         }
         else {
             Log.e("onResume", "gpsManager is null");
@@ -219,16 +226,23 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     @Override
     protected void onPause() {
         super.onPause();
-        if(gpsManager != null)
+        if(gpsManager != null) {
             gpsManager.getFacade().pause();
+        }
+
         Log.e("GPSAPP", "background");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(gpsManager != null)
+        if(gpsManager != null) {
+            if(isSubAll)
+                gpsManager.getFacade().unSubAll();
+
             gpsManager.getFacade().destroy();
+        }
+
     }
 
     @Override
@@ -449,6 +463,9 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
                 if(mMap == null)
                     return;
 
+                if(!isSubAll)
+                    subViewReload(true);
+
                 LocationJson location = gson.fromJson(payload, LocationJson.class);
                 if(location == null)
                     return;
@@ -501,6 +518,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         }).start();
 
     }
+
+
 
     @Override
     public void clearMap() {

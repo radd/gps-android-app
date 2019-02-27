@@ -92,7 +92,7 @@ public class PostLocationTask {
             return;
         }
 
-        location.setLocationId(mLocationDAO.persistLocation(location));
+        //location.setLocationId(mLocationDAO.persistLocation(location));
 
         mExecutor.execute(new Runnable() {
             @Override
@@ -119,18 +119,13 @@ public class PostLocationTask {
     }
 
     private void post(final BackgroundLocation location) {
-        long locationId = location.getLocationId();
+        //long locationId = location.getLocationId();
 
         if (mHasConnectivity ) {
 
-
-
             if (postLocation(location)) {
 
-
-
-
-                mLocationDAO.deleteLocationById(locationId);
+                //mLocationDAO.deleteLocationById(locationId);
 
                 return; // if posted successfully do nothing more
             } else {
@@ -138,22 +133,25 @@ public class PostLocationTask {
                 mService.openWebSocket();
             }
         } else {
-            mLocationDAO.updateLocationForSync(locationId);
+            //mLocationDAO.updateLocationForSync(locationId);
         }
 
-        if (mConfig.hasValidSyncUrl()) {
+       /* if (mConfig.hasValidSyncUrl()) {
             long syncLocationsCount = mLocationDAO.getLocationsForSyncCount(System.currentTimeMillis());
             if (syncLocationsCount >= mConfig.getSyncThreshold()) {
                 logger.debug("Attempt to sync locations: {} threshold: {}", syncLocationsCount, mConfig.getSyncThreshold());
                 mTaskListener.onSyncRequested();
             }
-        }
+        }*/
     }
 
     private boolean postLocation(BackgroundLocation location) {
         logger.debug("Executing PostLocationTask#postLocation");
-        JSONArray jsonLocations = new JSONArray();
 
+        if(LocationServiceImpl.stompClient == null || !LocationServiceImpl.stompClient.isConnected())
+            return false;
+
+        //JSONArray jsonLocations = new JSONArray();
         JSONObject jsonObject = new JSONObject();
 
         try {
@@ -173,9 +171,6 @@ public class PostLocationTask {
             logger.warn("Location to json failed: {}", location.toString());
             return false;
         }
-
-        if(LocationServiceImpl.stompClient == null || !LocationServiceImpl.stompClient.isConnected())
-            return false;
 
 
         LocationServiceImpl.stompClient.send("/ws/send/" + LocationServiceImpl.userID,

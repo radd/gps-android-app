@@ -805,6 +805,11 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
 
     public void getUsers() {
         usersIDs = new ArrayList<>();
+
+        if(!isNetworkAvailable()) {
+            return;
+        }
+
         try {
 
             HttpURLConnection conn = (HttpURLConnection) new URL(usersURL).openConnection();
@@ -850,7 +855,6 @@ public class LocationServiceImpl extends Service implements ProviderDelegate, Lo
             webSocketInfo("Nie połączono z Internetem");
             return;
         }
-
 
         if(token.isEmpty() || WS_URL.isEmpty()) {
             webSocketInfo("Nie znaleziono adresu WS");
