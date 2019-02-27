@@ -2,6 +2,7 @@ package com.example.woles.myapplication;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -64,7 +65,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     public static String serverIP = "40.115.21.196";
 
     private Gson gson = new Gson();
-
+    Typeface font;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +128,17 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         });
 
         checkTrack();
+
+        font = Typeface.createFromAsset( getAssets(), "fontello.ttf" );
+        //font = Typeface.createFromAsset( getAssets(), "fa-solid-900.ttf" );
+
+        TextView zoomIcon = (TextView) findViewById(R.id.zoomIcon);
+        TextView followIcon = (TextView) findViewById(R.id.followIcon);
+        TextView closeInfo = (TextView) findViewById(R.id.closeInfo);
+        zoomIcon.setTypeface(font);
+        followIcon.setTypeface(font);
+        closeInfo.setTypeface(font);
+
     }
 
     public void menuBtn_onClick(View view) {
@@ -283,7 +295,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         mainMarker.setPosition(latLng);
 
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.0f));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.0f));
 
         setMainUserLocation(location);
     }

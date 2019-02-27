@@ -2,4 +2,11 @@
     <string name="app_name">My Application</string>
     <string name="title_activity_maps">Map</string>
     <string name="token">token</string>
+
+
+    <string name="icon_navi">&#xF124;</string>
+    <string name="icon_pin">&#xF031;</string>
+    <string name="icon_cancel_2">&#xE800;</string>
+    <string name="icon_cancel">&#xF005;</string>
+
 </resources>

@@ -43,4 +43,24 @@ public class TestPluginDelegate implements PluginDelegate {
     public void onError(PluginException error) {
 
     }
+
+    @Override
+    public void onUsers(String users) {
+
+    }
+
+    @Override
+    public void onWebSocketMessage(String payload) {
+
+    }
+
+    @Override
+    public void clearMap() {
+
+    }
+
+    @Override
+    public void onWebSocketState(String state) {
+
+    }
 }

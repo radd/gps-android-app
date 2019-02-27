@@ -16,34 +16,72 @@
     />
 
     <RelativeLayout android:layout_width="match_parent"
-                    android:layout_height="110dp"
+                    android:layout_height="80dp"
                     android:background="@color/colorPrimary"
                     android:layout_below="@+id/infoBar"
-                    android:translationY="-110dp"
+android:translationY="-80dp"
                     android:id="@+id/moreInfoBar"
+                    android:paddingTop="20dp"
     >
+        <LinearLayout android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                      android:gravity="center"
+                      android:layout_marginLeft="20dp"
+                      android:onClick="zoom_onClick"
+        >
 
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:text="Przybliż"
-                  android:textColor="@color/mapInfoColor"
-                  android:padding="20dp"
-                  android:textSize="16sp"
-                  android:layout_marginLeft="20dp"
-                  android:id="@+id/zoom"
-                  android:onClick="zoom_onClick"
-        />
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/icon_pin"
+                      android:textColor="@color/mapInfoColor"
+                      android:textSize="28sp"
 
-        <TextView android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:text="Śledź"
-              android:textColor="@color/mapInfoColor"
-              android:padding="20dp"
-              android:textSize="16sp"
-              android:layout_centerHorizontal="true"
-              android:id="@+id/follow"
-              android:onClick="followUser_onClick"
-    />
+                      android:id="@+id/zoomIcon"
+                      android:paddingBottom="5dp"
+            />
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Przybliż"
+                      android:textColor="@color/mapInfoColor"
+                      android:textSize="12sp"
+                      android:id="@+id/zoom"
+            />
+
+        </LinearLayout>
+
+
+
+
+        <LinearLayout android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical"
+                      android:gravity="center"
+                      android:layout_centerHorizontal="true"
+                      android:onClick="followUser_onClick"
+        >
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/icon_navi"
+                      android:textColor="@color/mapInfoColor"
+                      android:textSize="28sp"
+                      android:onClick="followUser_onClick"
+                      android:id="@+id/followIcon"
+                      android:paddingBottom="5dp"
+            />
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Śledź"
+                      android:textColor="@color/mapInfoColor"
+                      android:textSize="12sp"
+                      android:id="@+id/follow"
+
+            />
+
+        </LinearLayout>
 
     </RelativeLayout>
 
@@ -51,7 +89,7 @@
     <RelativeLayout android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignTop="@+id/map"
-                    android:paddingTop="10dp"
+
                     android:paddingBottom="10dp"
                     android:background="#FF3F51B5"
                     android:onClick="showMoreInfo"
@@ -93,7 +131,8 @@
                   android:layout_centerHorizontal="true"
                   android:id="@+id/name"
                   android:textColor="@color/mapInfoColor"
-                  android:layout_marginTop="0dp"
+                  android:layout_marginTop="10dp"
+
         />
 
 
@@ -149,13 +188,15 @@
 
         <TextView android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:text="X"
-                  android:textSize="30sp"
+                  android:text="@string/icon_cancel"
+                  android:textSize="20sp"
                   android:id="@+id/closeInfo"
-                  android:textColor="@color/mapInfoColor"
+                  android:textColor="#E6FFFFFF"
                   android:layout_alignParentRight="true"
-                  android:layout_marginTop="-10dp"
-                  android:layout_marginRight="5dp"
+                  android:paddingTop="5dp"
+                  android:paddingRight="10dp"
+                  android:paddingLeft="15dp"
+                  android:paddingBottom="15dp"
                   android:onClick="closeInfoBar"
         />
 
