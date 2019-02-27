@@ -48,7 +48,7 @@
 
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:text="248m"
+                      android:text="0m"
                       android:textSize="22sp"
                       android:id="@+id/altitude"
                       android:textColor="@color/mapInfoColor"
@@ -78,7 +78,7 @@
 
         <TextView android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:text="56"
+                  android:text="0"
                   android:textSize="30sp"
                   android:layout_below="@+id/name"
                   android:layout_centerHorizontal="true"
@@ -108,9 +108,9 @@
 
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:text="24m"
+                      android:text="0m"
                       android:textSize="22sp"
-                      android:id="@+id/accuraccy"
+                      android:id="@+id/accuracy"
                       android:textColor="@color/mapInfoColor"
 
             />
@@ -119,7 +119,7 @@
                       android:text="dokładność"
                       android:textSize="12sp"
                       android:layout_below="@+id/altitude"
-                      android:id="@+id/accuraccyText"
+                      android:id="@+id/accuracyText"
                       android:textColor="@color/mapInfoColor"
             />
 

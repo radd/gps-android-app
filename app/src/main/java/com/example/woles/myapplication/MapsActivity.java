@@ -14,6 +14,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
+import com.google.gson.Gson;
 import com.marianhello.bgloc.PluginDelegate;
 import com.marianhello.bgloc.PluginException;
 import com.marianhello.bgloc.WebSocketTrans;
@@ -48,8 +49,17 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     private TextView connState;
     View infoBar;
     View moreInfoBar;
+    private String activeUserID;
+
+    private TextView altitude;
+    private TextView speed;
+    private TextView accuracy;
+    private TextView name;
 
     public static String serverIP = "40.115.21.196";
+
+    private Gson gson = new Gson();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +94,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
                     isRunning = false;
                     startBtn.setText("Start");
                     gpsManager.getFacade().stop();
+                    speed.setText("0");
                 }
                 else {
                     startBtn.setText("Stop");
@@ -97,6 +108,12 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         connState = (TextView) findViewById(R.id.connectionInfo);
         infoBar  = findViewById(R.id.infoBar);
         moreInfoBar  = findViewById(R.id.moreInfoBar);
+        speed  = (TextView) findViewById(R.id.speed);
+        altitude  = (TextView) findViewById(R.id.altitude);
+        accuracy  = (TextView) findViewById(R.id.accuracy);
+        name  = (TextView) findViewById(R.id.name);
+
+        activeUserID = UserInfo.getUserID();
     }
 
     public void menuBtn_onClick(View view) {
@@ -109,6 +126,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
             gpsManager.getFacade().unSubAll();
             subBtn.setText("Obserwuj");
             isSubAll = false;
+            getCurrentLocation();
         }
         else {
             isSubAll = true;
@@ -156,8 +174,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         LatLng cord = new LatLng(50, 19);
 
         //TODO init after get curr location
-        mainMarker = mMap.addMarker(new MarkerOptions().position(cord).title("Moja lokalizacja"));
-        mainMarker.setTag("id1");
+        mainMarker = mMap.addMarker(new MarkerOptions().position(cord).title("Twoja lokalizacja"));
+        mainMarker.setTag(UserInfo.getUserID());
         mainMarker.showInfoWindow();
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
@@ -192,11 +210,14 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         if(marker.getTag() == null)
             return false;
 
-        if (marker.getTag().equals("id1"))
-        {
-            //handle click here
-            Log.e("", "clicked4");
-        }
+        activeUserID = (String) marker.getTag();
+
+        if(activeUserID.equals(UserInfo.getUserID()))
+            name.setText("Twoja lokalizacja");
+        else
+            name.setText(users.get(activeUserID).getUsername());
+
+        setUserInfo(lastLocations.get(activeUserID));
         marker.showInfoWindow();
         return false;
     }
@@ -209,6 +230,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         mainMarker.setPosition(latLng);
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.0f));
+
+        setMainUserLocation(location);
     }
 
     private void setChangeLocation(BackgroundLocation location) {
@@ -216,9 +239,30 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
             return;
         //Log.e("", ""+ location.getLatitude());
         mainMarker.setPosition( new LatLng(location.getLatitude(), location.getLongitude()));
+
+        if(activeUserID == UserInfo.getUserID())
+            setUserInfo(location);
+
     }
 
+    private void setMainUserLocation(BackgroundLocation location) {
+        setUserInfo(location);
 
+        LocationJson loc = null;
+        if((loc = lastLocations.get(UserInfo.getUserID())) == null) {
+            loc = new LocationJson();
+        }
+
+        loc.setUserID(UserInfo.getUserID());
+        loc.setTrackID(UserInfo.getTrackID());
+        loc.setLatitude(String.valueOf(location.getLatitude()));
+        loc.setLongitude(String.valueOf(location.getLongitude()));
+        loc.setAltitude( (float) location.getAltitude());
+        loc.setAccuracy(location.getAccuracy());
+        loc.setSpeed(location.getSpeed());
+
+        lastLocations.put(UserInfo.getUserID(), loc);
+    }
 
 
     @Override
@@ -299,9 +343,10 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     }
 
 
-    private ConcurrentHashMap<String, JSONObject> users = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, UserJson> users = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Marker> markers = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Polyline> polylines = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, LocationJson> lastLocations = new ConcurrentHashMap<>();
 
 
     @Override
@@ -315,8 +360,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
             JSONArray array = new JSONArray(usersJson);
 
             for(int i = 0;i<array.length();i++) {
-                JSONObject user = array.getJSONObject(i);
-                users.put(user.getString("_id"), user);
+                UserJson user = gson.fromJson(array.getJSONObject(i).toString(), UserJson.class);
+                users.put(user.getID(), user);
             }
 
 
@@ -336,48 +381,50 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
                 if(mMap == null)
                     return;
 
-                JSONObject location = null;
-                try {
-                    location = new JSONObject(payload);
+                LocationJson location = gson.fromJson(payload, LocationJson.class);
+                if(location == null)
+                    return;
 
-                    String userID = location.getString("userID");
-                    if( users.get(location.getString("userID")) != null) {
+                if( users.get(location.getUserID()) == null)
+                    return;
 
-                        LatLng latLng = new LatLng(Double.valueOf(location.getString("latitude")),
-                                Double.valueOf(location.getString("longitude")));
+                UserJson user = users.get(location.getUserID());
 
-                        if(markers.get(userID) != null ) {
-                            ThreadUtils.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    markers.get(userID).setPosition(latLng);
+                LatLng latLng = new LatLng(Double.valueOf(location.getLatitude()),
+                        Double.valueOf(location.getLongitude()));
 
-                                }
-                            });
+                lastLocations.put(user.getID(), location);
+
+                if(markers.get(user.getID()) != null ) {
+                    ThreadUtils.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            markers.get(user.getID()).setPosition(latLng);
+
+                            if(activeUserID.equals(user.getID()))
+                                setUserInfo(location);
                         }
-                        else {
-                            String username = users.get(location.getString("userID")).getString("username");
-                            ThreadUtils.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).title(username));
-                                    marker.showInfoWindow();
-                                    markers.put(userID, marker);
-
-                                }
-                            });
-
-                        }
-
-                        Log.e("LOG", "User: " + users.get(location.getString("userID")).getString("username")
-                                + " loc: " + location.getString("latitude")
-                                + " " + location.getString("longitude"));
-                    }
-
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    });
                 }
+                else {
+                    ThreadUtils.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).title(user.getUsername()));
+                            marker.setTag(user.getID());
+                            marker.showInfoWindow();
+                            markers.put(user.getID(), marker);
+
+                        }
+                    });
+
+                }
+
+                Log.e("LOG", "User: " + user.getUsername()
+                        + " loc: " + location.getLatitude()
+                        + " " + location.getLongitude());
+
+
 
             }
         }).start();
@@ -445,6 +492,41 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
             moreInfoBar.animate().translationY(-10f);
         }
         isMoreInfoBarActive = !isMoreInfoBarActive;
+    }
+
+
+    // TODO use interface (BackgroundLocation and LocationJson)
+    private void setUserInfo(BackgroundLocation location) {
+        if(!isInfoBarActive || location == null)
+            return;
+
+        speed.setText(String.valueOf(prepareSpeed(location.getSpeed())));
+        altitude.setText(prepareAltitude(location.getAltitude()));
+        accuracy.setText(prepareAccuracy(location.getAccuracy()));
+
+    }
+
+    private void setUserInfo(LocationJson location) {
+        if(!isInfoBarActive || location == null)
+            return;
+
+        speed.setText(String.valueOf(prepareSpeed(location.getSpeed())));
+        altitude.setText(prepareAltitude(location.getAltitude()));
+        accuracy.setText(prepareAccuracy(location.getAccuracy()));
+
+    }
+
+    private int prepareSpeed(float speed) {
+        float speedInKMPerH = speed * 3600 / 1000;
+        return Math.round(speedInKMPerH);
+    }
+
+    private String prepareAltitude(double altitude) {
+        return Math.round(altitude) + "m";
+    }
+
+    private String prepareAccuracy(float accuracy) {
+        return Math.round(accuracy) + "m";
     }
 }
 
