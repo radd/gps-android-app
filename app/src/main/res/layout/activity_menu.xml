@@ -24,7 +24,7 @@
     />
 
     <TextView
-            android:text="Piotr Radziszewski"
+            android:text=""
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/textViewAcc"
@@ -34,7 +34,7 @@
             android:id="@+id/username"
     />
     <TextView
-            android:text="email@email.com"
+            android:text=""
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/username"
@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/username"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="40dp"
+            android:layout_marginRight="28dp"
             android:id="@+id/logout"
             android:onClick="logout"
     />
@@ -78,7 +78,7 @@
                     android:onClick="trackBtn_OnClick"
             />
             <Button
-                    android:text="Odśwież połączenie z serverem"
+                    android:text="Odśwież połączenie z serwerem"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"

@@ -149,7 +149,7 @@ public class MenuActivity extends AppCompatActivity {
 
 
                 alertDialog.setTitle("");
-                alertDialog.setMessage("Traza została zakończona");
+                alertDialog.setMessage("Trasa została zakończona");
                 alertDialog.setCancelable(false);
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                         new DialogInterface.OnClickListener() {

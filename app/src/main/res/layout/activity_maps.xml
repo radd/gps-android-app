@@ -208,7 +208,7 @@ android:translationY="-80dp"
 
 
     <TextView android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
+              android:layout_height="0dp"
               android:text="WS serwer: ?"
               android:layout_alignBottom="@+id/map"
               android:layout_alignRight="@+id/map"

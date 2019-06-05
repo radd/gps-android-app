@@ -3,36 +3,41 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-               tools:context="com.example.woles.myapplication.MenuActivity">
+               tools:context="com.example.woles.myapplication.NewTrackActivity">
 
     <TextView
             android:text="Nazwa trasy"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/nameInput"
             android:id="@+id/textView"
-            android:layout_above="@+id/nameInput"
-            android:layout_marginBottom="-38dp"/>
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="30dp"
+            />
 
     <EditText
-            android:layout_width="314dp"
-            android:layout_height="59dp"
-            android:inputType="textPersonName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapSentences"
             android:text=""
             android:ems="10"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="38dp"
             android:id="@+id/nameInput"
-            android:layout_centerHorizontal="true"/>
+            android:layout_alignLeft="@+id/textView"
+            android:layout_alignRight="@+id/textView"
+            android:layout_below="@+id/textView"
+
+    />
 
     <Button
             android:text="Zapisz"
-            android:layout_width="315dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="122dp"
-            android:layout_alignStart="@+id/nameInput"
             android:id="@+id/saveBtn"
             android:onClick="saveBtn_OnClick"
+            android:layout_alignLeft="@+id/textView"
+            android:layout_alignRight="@+id/textView"
+            android:layout_below="@+id/nameInput"
+            android:layout_marginTop="20dp"
     />
 </RelativeLayout>

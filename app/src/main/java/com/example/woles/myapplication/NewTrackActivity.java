@@ -43,7 +43,7 @@ public class NewTrackActivity extends AppCompatActivity {
     }
 
     public void saveBtn_OnClick(View view) {
-        if(!nameInput.getText().equals("")) {
+        if(!nameInput.getText().toString().equals("")) {
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             progressDialog.setTitle("Zapisywanie");
             progressDialog.setMessage("Czekaj...");
@@ -77,7 +77,7 @@ public class NewTrackActivity extends AppCompatActivity {
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL("http://"+MapsActivity.serverIP+":8080/api/track/create_track").openConnection();
             conn.setDoOutput(true);
-            conn.setFixedLengthStreamingMode(body.length());
+            //conn.setFixedLengthStreamingMode(body.length());
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("Authorization", "Bearer " + UserInfo.getToken());
@@ -117,7 +117,7 @@ public class NewTrackActivity extends AppCompatActivity {
                 MapsActivity.gpsManager.getFacade().setTrackID(trackID);
 
                 alertDialog.setTitle("");
-                alertDialog.setMessage("Traza została utworzona");
+                alertDialog.setMessage("Trasa została utworzona");
                 alertDialog.setCancelable(false);
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                         new DialogInterface.OnClickListener() {
@@ -142,17 +142,48 @@ public class NewTrackActivity extends AppCompatActivity {
 
             }
             else {
-
+                BufferedReader br = new BufferedReader(new InputStreamReader((conn.getErrorStream())));
+                StringBuilder sb = new StringBuilder();
+                String output;
+                while ((output = br.readLine()) != null) {
+                    sb.append(output);
+                }
+                JSONObject jsonBody = new JSONObject(sb.toString());
+                String errorMsg = jsonBody.getString("message");
+                showErrorMessage(errorMsg);
 
             }
 
 
         } catch (IOException e) {
             e.printStackTrace();
+            showErrorMessage(e.getMessage());
         } catch (JSONException e) {
             e.printStackTrace();
+            showErrorMessage(e.getMessage());
         }
 
+    }
+
+    private void showErrorMessage(String message) {
+
+        alertDialog.setTitle("Błąd");
+        alertDialog.setMessage(message);
+        alertDialog.setCancelable(false);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        ThreadUtils.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.dismiss();
+                alertDialog.show();
+            }
+        });
     }
 
 }

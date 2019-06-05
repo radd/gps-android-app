@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import org.chromium.content.browser.ThreadUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -83,7 +84,7 @@ public class SignUpActivity extends AppCompatActivity {
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL("http://"+MapsActivity.serverIP+":8080/api/auth/sign-up").openConnection();
             conn.setDoOutput(true);
-            conn.setFixedLengthStreamingMode(body.length());
+            //conn.setFixedLengthStreamingMode(body.length());
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
 
@@ -122,8 +123,13 @@ public class SignUpActivity extends AppCompatActivity {
                             }
                         });
 
-                progressDialog.dismiss();
-                alertDialog.show();
+                ThreadUtils.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.dismiss();
+                        alertDialog.show();
+                    }
+                });
             }
             else {
 
@@ -161,7 +167,7 @@ public class SignUpActivity extends AppCompatActivity {
                     }
                 });
 
-        SignUpActivity.this.runOnUiThread(new Runnable() {
+        ThreadUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 progressDialog.dismiss();

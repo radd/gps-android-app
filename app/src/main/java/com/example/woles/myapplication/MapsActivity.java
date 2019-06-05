@@ -62,7 +62,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     private TextView trackName;
     private View trackInfo;
 
-    public static String serverIP = "40.115.21.196";
+    //public static String serverIP = "40.115.21.196";
+    public static String serverIP = "192.168.1.4";
 
     private Gson gson = new Gson();
     Typeface font;
@@ -192,7 +193,8 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         LatLng latLng = new LatLng(Double.valueOf(loc.getLatitude()),
                 Double.valueOf(loc.getLongitude()));
 
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f));
+        float zoomLevel = mMap.getCameraPosition().zoom < 16f ? 16f : mMap.getCameraPosition().zoom;
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
     }
 
     private void followUser() {
@@ -265,7 +267,7 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
 
 
        if(!gpsManager.getFacade().isRunning()) {
-            if(gpsManager.getFacade().getAuthorizationStatus() == 1)
+            //if(gpsManager.getFacade().getAuthorizationStatus() == 1)
                 getCurrentLocation();
         }
 
@@ -318,10 +320,11 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
         if(mainMarker == null)
             return;
         //Log.e("", ""+ location.getLatitude());
-        mainMarker.setPosition( new LatLng(location.getLatitude(), location.getLongitude()));
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        mainMarker.setPosition(latLng);
 
-        if(activeUserID == UserInfo.getUserID())
-            setUserInfo(location);
+        if(isFollow && followUserID.equals(UserInfo.getUserID()))
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, mMap.getCameraPosition().zoom));
 
         setMainUserLocation(location);
     }
@@ -614,11 +617,11 @@ public class MapsActivity extends FragmentActivity implements IGPSManager, Plugi
     }
 
     private String prepareAltitude(double altitude) {
-        return Math.round(altitude) + "m";
+        return Math.round(altitude) + " m";
     }
 
     private String prepareAccuracy(float accuracy) {
-        return Math.round(accuracy) + "m";
+        return Math.round(accuracy) + " m";
     }
 
     private void setMoreInfo() {
